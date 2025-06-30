@@ -24,7 +24,7 @@ def store(request, category_slug=None):
 
 def product_detail(request, category_slug, product_slug):
     try:
-        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
+        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug) # category__slug is the syntax to filter by related model's field
     except Exception as e:
         raise e
     
