@@ -37,6 +37,43 @@ def add_cart(request, product_id):
 
     return redirect('cart')
 
+def remove_cart(request, product_id):
+    product = Product.objects.get(id=product_id)
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+    except Cart.DoesNotExist:
+        cart = Cart.objects.create(cart_id=_cart_id(request))
+    cart.save()
+
+    try:
+        cart_item = CartItem.objects.get(product=product, cart=cart)
+        cart_item.quantity -= 1
+        cart_item.save()
+    except CartItem.DoesNotExist:
+        cart_item = CartItem.objects.create(
+            product=product,
+            quantity=1,
+            cart=cart
+        )
+        cart_item.save()
+
+    if cart_item.quantity <= 0:
+        cart_item.delete()
+
+    return redirect('cart')
+
+def remove_cart_item(request, product_id):
+    cart = Cart.objects.get(cart_id=_cart_id(request))
+    product = Product.objects.get(id=product_id)
+    
+    try:
+        cart_item = CartItem.objects.get(product=product, cart=cart)
+        cart_item.delete()
+    except CartItem.DoesNotExist:
+        pass
+
+    return redirect('cart')
+
 def cart(request, total=0, quantity=0, cart_items=None):
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
@@ -44,6 +81,10 @@ def cart(request, total=0, quantity=0, cart_items=None):
         for cart_item in cart_items:
             total += (cart_item.product.product_price * cart_item.quantity)
             quantity += cart_item.quantity
+
+        tax = (2 * total) / 100  # Assuming a tax rate of 2%
+        grand_total = total + tax
+
     except Cart.DoesNotExist:
         pass
 
@@ -51,6 +92,9 @@ def cart(request, total=0, quantity=0, cart_items=None):
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
+        'tax': tax,
+        'grand_total': grand_total,
+        'cart_count': cart_items.count() if cart_items else 0,
     }
 
     return render(request, 'store/cart.html', context)

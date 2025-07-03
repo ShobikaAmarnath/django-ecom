@@ -3,43 +3,51 @@
 {% load static %}
 {% block content %}
 
-<section class="section-intro padding-y-sm">
-<div class="container">
-
-<div class="intro-banner-wrap">
-	<img src="{% static 'images/banners/1.jpg' %}" class="img-fluid rounded">
-</div>
-
-</div> <!-- container //  -->
+<!-- Hero Banner -->
+<section class="py-8 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="rounded-lg overflow-hidden">
+      <img src="{% static 'images/banners/1.jpg' %}" class="w-full h-64 md:h-80 object-cover rounded-lg">
+    </div>
+  </div>
 </section>
 
-<section class="section-name padding-y-sm">
-<div class="container">
+<!-- Popular Products -->
+<section class="py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="flex justify-between items-center mb-8">
+      <h3 class="text-2xl font-bold text-gray-900">Popular Products</h3>
+      <a href="{% url 'store' %}" class="bg-white border border-primary text-primary px-6 py-2 rounded-md hover:bg-primary hover:text-white transition-colors">
+        See all
+      </a>
+    </div>
 
-<header class="section-heading">
-	<a href="{% url 'store' %}" class="btn btn-outline-primary float-right">See all</a>
-	<h3 class="section-title">Popular products</h3>
-</header><!-- sect-heading -->
-
-	
-<div class="row">
-	{% for product in products %}
-	<div class="col-md-3">
-		<div class="card card-product-grid">
-			<a href="{{ product.get_url }}" class="img-wrap"> <img src="{{ product.product_image.url }}"> </a>
-			<figcaption class="info-wrap">
-				<a href="{{ product.get_url }}" class="title">{{product.product_name}}</a>
-				<div class="price mt-1">${{ product.product_price }}</div> <!-- price-wrap.// -->
-			</figcaption>
-		</div>
-	</div>
-	{% endfor %}
-</div> <!-- row.// -->
-
-</div><!-- container // -->
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for product in products %}
+      <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <a href="{{ product.get_url }}" class="block">
+          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden">
+            <img src="{{ product.product_image.url }}" 
+                 alt="{{ product.product_name }}"
+                 class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+          </div>
+        </a>
+        <div class="p-4">
+          <a href="{{ product.get_url }}" class="block">
+            <h4 class="text-lg font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2">
+              {{ product.product_name }}
+            </h4>
+          </a>
+          <div class="mt-2">
+            <span class="text-xl font-bold text-gray-900">${{ product.product_price }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </section>
-
-</body>
-</html>
 
 {% endblock content %}
