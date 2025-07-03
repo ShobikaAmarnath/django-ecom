@@ -4,169 +4,171 @@
 
 {% block content %}
 
-<!-- ========================= SECTION PAGETOP ========================= -->
-<section class="section-pagetop bg">
-<div class="container">
-	<h2 class="title-page">Our Store</h2>
-	
-</div> <!-- container //  -->
+<!-- Page Header -->
+<section class="bg-gray-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl font-bold text-gray-900">Our Store</h2>
+  </div>
 </section>
-<!-- ========================= SECTION INTRO END// ========================= -->
 
-<!-- ========================= SECTION CONTENT ========================= -->
-<section class="section-content padding-y">
-<div class="container">
+<!-- Main Content -->
+<section class="py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Sidebar Filters -->
+      <aside class="lg:w-1/4">
+        <div class="bg-white rounded-lg shadow-md">
+          
+          <!-- Categories Filter -->
+          <div class="border-b border-gray-200">
+            <div class="p-4">
+              <h6 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fa fa-chevron-down mr-2"></i>
+                Categories
+              </h6>
+              <ul class="space-y-2">
+                <li><a href="{% url 'store' %}" class="text-gray-600 hover:text-primary transition-colors">All Products</a></li>
+                {% for category in links %}
+                <li><a href="{{ category.get_url }}" class="text-gray-600 hover:text-primary transition-colors">{{category.category_name}}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
 
-<div class="row">
-	<aside class="col-md-3">
-		
-<div class="card">
-	<article class="filter-group">
-		<header class="card-header">
-			<a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
-				<i class="icon-control fa fa-chevron-down"></i>
-				<h6 class="title">Categories</h6>
-			</a>
-		</header>
-		<div class="filter-content collapse show" id="collapse_1" style="">
-			<div class="card-body">
-				
-				<ul class="list-menu">
-					<li><a href="{% url 'store' %}">All Products</a></li>
-					{% for category in links %}
-				<li><a href="{{ category.get_url }}">{{category.category_name}}</a></li>
-				{% endfor %}
-				</ul>
+          <!-- Sizes Filter -->
+          <div class="border-b border-gray-200">
+            <div class="p-4">
+              <h6 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fa fa-chevron-down mr-2"></i>
+                Sizes
+              </h6>
+              <div class="flex flex-wrap gap-2">
+                <label class="inline-flex items-center">
+                  <input type="checkbox" class="sr-only">
+                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XS</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input type="checkbox" class="sr-only">
+                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">SM</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input type="checkbox" class="sr-only">
+                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">LG</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input type="checkbox" class="sr-only">
+                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XXL</span>
+                </label>
+              </div>
+            </div>
+          </div>
 
-			</div> <!-- card-body.// -->
-		</div>
-	</article> <!-- filter-group  .// -->
-	<article class="filter-group">
-		<header class="card-header">
-			<a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
-				<i class="icon-control fa fa-chevron-down"></i>
-				<h6 class="title">Sizes </h6>
-			</a>
-		</header>
-		<div class="filter-content collapse show" id="collapse_4" style="">
-			<div class="card-body">
-			  <label class="checkbox-btn">
-			    <input type="checkbox">
-			    <span class="btn btn-light"> XS </span>
-			  </label>
+          <!-- Price Range Filter -->
+          <div class="p-4">
+            <h6 class="font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fa fa-chevron-down mr-2"></i>
+              Price Range
+            </h6>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Min</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="0">$0</option>
+                  <option value="50">$50</option>
+                  <option value="100">$100</option>
+                  <option value="150">$150</option>
+                  <option value="200">$200</option>
+                  <option value="500">$500</option>
+                  <option value="1000">$1000</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Max</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="50">$50</option>
+                  <option value="100">$100</option>
+                  <option value="150">$150</option>
+                  <option value="200">$200</option>
+                  <option value="500">$500</option>
+                  <option value="1000">$1000</option>
+                  <option value="2000">$2000+</option>
+                </select>
+              </div>
+            </div>
+            <button class="w-full bg-primary text-white py-2 rounded-md hover:bg-blue-700 transition-colors">Apply</button>
+          </div>
+        </div>
+      </aside>
 
-			  <label class="checkbox-btn">
-			    <input type="checkbox">
-			    <span class="btn btn-light"> SM </span>
-			  </label>
+      <!-- Main Content -->
+      <main class="lg:w-3/4">
+        <!-- Results Header -->
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+          <span class="text-gray-600"><strong>{{product_count}}</strong> items found</span>
+        </div>
 
-			  <label class="checkbox-btn">
-			    <input type="checkbox">
-			    <span class="btn btn-light"> LG </span>
-			  </label>
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for product in products %}
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden">
+              <a href="{{ product.get_url }}">
+                <img src="{{product.product_image.url}}" 
+                     alt="{{ product.product_name }}"
+                     class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+              </a>
+            </div>
+            <div class="p-4">
+              <div class="h-20 mb-4">
+                <a href="{{ product.get_url }}" class="text-lg font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2">
+                  {{ product.product_name }}
+                </a>
+                <div class="mt-2">
+                  <span class="text-xl font-bold text-gray-900">${{product.product_price}}</span>
+                </div>
+              </div>
+              {% if product.stock <= 0 %}
+                <button class="w-full bg-gray-400 text-white py-2 rounded-md cursor-not-allowed" disabled>
+                  Out of Stock
+                </button>
+              {% else %}
+                <a href="{% url 'add_cart' product.id %}" class="block w-full bg-primary text-white text-center py-2 rounded-md hover:bg-blue-700 transition-colors">
+                  Add to cart
+                </a>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
 
-			  <label class="checkbox-btn">
-			    <input type="checkbox">
-			    <span class="btn btn-light"> XXL </span>
-			  </label>
-		</div><!-- card-body.// -->
-		</div>
-	</article> <!-- filter-group .// -->
-	
-	<article class="filter-group">
-		<header class="card-header">
-			<a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
-				<i class="icon-control fa fa-chevron-down"></i>
-				<h6 class="title">Price range </h6>
-			</a>
-		</header>
-		<div class="filter-content collapse show" id="collapse_3" style="">
-			<div class="card-body">
-				
-				<div class="form-row">
-				<div class="form-group col-md-6">
-				  <label>Min</label>
-				  <!-- <input class="form-control" placeholder="$0" type="number"> -->
-				  	<select class="mr-2 form-control">
-						<option value="0">$0</option>
-						<option value="50">$50</option>
-						<option value="100">$100</option>
-						<option value="150">$150</option>
-						<option value="200">$200</option>
-						<option value="500">$500</option>
-						<option value="1000">$1000</option>
-					</select>
-				</div>
-				<div class="form-group text-right col-md-6">
-				  <label>Max</label>
-				  	<select class="mr-2 form-control">
-						<option value="50">$50</option>
-						<option value="100">$100</option>
-						<option value="150">$150</option>
-						<option value="200">$200</option>
-						<option value="500">$500</option>
-						<option value="1000">$1000</option>
-						<option value="2000">$2000+</option>
-					</select>
-				</div>
-				</div> <!-- form-row.// -->
-				<button class="btn btn-block btn-primary">Apply</button>
-			</div><!-- card-body.// -->
-		</div>
-	</article> <!-- filter-group .// -->
-	
-</div> <!-- card.// -->
-
-	</aside> <!-- col.// -->
-	<main class="col-md-9">
-
-<header class="border-bottom mb-4 pb-3">
-		<div class="form-inline">
-			<span class="mr-md-auto"><b>{{product_count}}</b> items found</span>
-			
-		</div>
-</header><!-- sect-heading -->
-
-<div class="row">
-	{% for product in products %}
-	<div class="col-md-4">
-		<figure class="card card-product-grid">
-			<div class="img-wrap"> 
-				
-				<a href="{{ product.get_url }}"><img src="{{product.product_image.url}}"></a>
-				
-			</div> <!-- img-wrap.// -->
-			<figcaption class="info-wrap">
-				<div class="fix-height">
-					<a href="{{ product.get_url }}" class="title">{{ product.product_name }}</a>
-					<div class="price-wrap mt-2">
-						<span class="price">${{product.product_price}}</span>
-					</div> <!-- price-wrap.// -->
-				</div>
-				<a href="{% url 'add_cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a>
-			</figcaption>
-		</figure>
-	</div> <!-- col.// -->
-	{% endfor %}
-</div> <!-- row end.// -->
-
-
-<nav class="mt-4" aria-label="Page navigation sample">
-  <ul class="pagination">
-    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-  </ul>
-</nav>
-
-	</main> <!-- col.// -->
-
-</div>
-
-</div> <!-- container .//  -->
+        <!-- Pagination -->
+        <nav class="mt-8 flex justify-center">
+          <ul class="flex items-center space-x-1">
+            <li>
+              <a href="#" class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50">
+                Previous
+              </a>
+            </li>
+            <li>
+              <a href="#" class="px-3 py-2 text-white bg-primary border border-primary">1</a>
+            </li>
+            <li>
+              <a href="#" class="px-3 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">2</a>
+            </li>
+            <li>
+              <a href="#" class="px-3 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">3</a>
+            </li>
+            <li>
+              <a href="#" class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50">
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+  </div>
 </section>
-<!-- ========================= SECTION CONTENT END// ========================= -->
 
 {% endblock %}

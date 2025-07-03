@@ -1,83 +1,111 @@
 {% load static %}
 
-<header class="section-header">
-<nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom">
-<div class="container">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop4" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarTop4">
-    <ul class="navbar-nav mr-auto">
-    	<li class="nav-item dropdown">
-		 	<a href="#" class="nav-link">   English </a>
-		    
-		</li>
-		<li class="nav-item dropdown">
-			<a href="#" class="nav-link"> USD </a>
-		</li>
-    </ul>
-    <ul class="navbar-nav">
-		<li><a href="#" class="nav-link"> <i class="fa fa-envelope"></i> Email </a></li>
-		<li><a href="#" class="nav-link"> <i class="fa fa-phone"></i> Call us </a></li>
-	</ul> <!-- list-inline //  -->
-  </div> <!-- navbar-collapse .// -->
-</div> <!-- container //  -->
+<header class="bg-white shadow-sm">
+<!-- Top Navigation -->
+<nav class="border-b border-gray-200">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center h-12">
+    <!-- Left side -->
+    <div class="flex items-center space-x-6">
+      <a href="#" class="text-gray-600 hover:text-gray-900 text-sm flex items-center">
+        <span>English</span>
+      </a>
+      <a href="#" class="text-gray-600 hover:text-gray-900 text-sm flex items-center">
+        <span>USD</span>
+      </a>
+    </div>
+    
+    <!-- Right side -->
+    <div class="flex items-center space-x-6">
+      <a href="#" class="text-gray-600 hover:text-gray-900 text-sm flex items-center">
+        <i class="fa fa-envelope mr-2"></i>
+        <span>Email</span>
+      </a>
+      <a href="#" class="text-gray-600 hover:text-gray-900 text-sm flex items-center">
+        <i class="fa fa-phone mr-2"></i>
+        <span>Call us</span>
+      </a>
+    </div>
+  </div>
+</div>
 </nav>
 
-<section class="header-main border-bottom">
-	<div class="container">
-<div class="row align-items-center">
-	<div class="col-lg-2 col-md-3 col-6">
-		<a href="{% url 'home' %}" class="brand-wrap">
-			<img class="logo" src="{% static './images/logo.png' %}">
-		</a> <!-- brand-wrap.// -->
-	</div>
-	<div class="col-lg col-sm col-md col-6 flex-grow-0">
-		<div class="category-wrap dropdown d-inline-block float-right">
-			<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"> 
-				<i class="fa fa-bars"></i> All category 
-			</button>
-			<div class="dropdown-menu">
-				{% for category in links %}
-				<a class="dropdown-item" href="{{ category.get_url }}">{{ category.category_name }}</a>
-				{% endfor %}
-			</div>
-		</div>  <!-- category-wrap.// -->
-	</div> <!-- col.// -->
-	<a href="{% url 'store' %}" class="btn btn-outline-primary">Store</a>
-	<div class="col-lg  col-md-6 col-sm-12 col">
-		<form action="#" class="search">
-			<div class="input-group w-100">
-			    <input type="text" class="form-control" style="width:60%;" placeholder="Search">
-			    
-			    <div class="input-group-append">
-			      <button class="btn btn-primary" type="submit">
-			        <i class="fa fa-search"></i>
-			      </button>
-			    </div>
-		    </div>
-		</form> <!-- search-wrap .end// -->
-	</div> <!-- col.// -->
-	<div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
-				<div class="d-flex justify-content-end mb-3 mb-lg-0">
-					<div class="widget-header">
-						<small class="title text-muted">Welcome guest!</small>
-						<div> 
-							<a href="./signin.html">Sign in</a> <span class="dark-transp"> | </span>
-							<a href="./register.html"> Register</a>
-						</div>
-					</div>
-					<a href="{% url 'cart' %}" class="widget-header pl-3 ml-3">
-						<div class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></div>
-						<span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
-					</a>
-				</div> <!-- widgets-wrap.// -->
-			</div> <!-- col.// -->
-</div> <!-- row.// -->
-	</div> <!-- container.// -->
-</section> <!-- header-main .// -->
+<!-- Main Header -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex items-center justify-between h-16">
+    <!-- Logo -->
+    <div class="flex-shrink-0">
+      <a href="{% url 'home' %}" class="flex items-center">
+        <img class="h-8 w-auto" src="{% static './images/logo.png' %}" alt="GreatKart">
+      </a>
+    </div>
 
+    <!-- Categories Dropdown -->
+    <div class="relative">
+      <div class="dropdown inline-block relative">
+        <button class="bg-primary text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition-colors">
+          <i class="fa fa-bars mr-2"></i>
+          All Categories
+          <i class="fa fa-chevron-down ml-2"></i>
+        </button>
+        <div class="dropdown-menu absolute hidden bg-white shadow-lg rounded-md mt-1 py-2 w-48 z-50">
+          {% for category in links %}
+          <a class="block px-4 py-2 text-gray-800 hover:bg-gray-100" href="{{ category.get_url }}">{{ category.category_name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
+    <!-- Store Link -->
+    <a href="{% url 'store' %}" class="bg-white border border-primary text-primary px-4 py-2 rounded-md hover:bg-primary hover:text-white transition-colors">
+      Store
+    </a>
 
+    <!-- Search Bar -->
+    <div class="flex-1 max-w-lg mx-8">
+      <form action="#" class="relative">
+        <div class="flex">
+          <input type="text" 
+                 class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                 placeholder="Search products...">
+          <button type="submit" 
+                  class="bg-primary text-white px-6 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
 
+    <!-- User Actions -->
+    <div class="flex items-center space-x-4">
+      <!-- User Menu -->
+      <div class="text-right">
+        <div class="text-xs text-gray-500">Welcome guest!</div>
+        <div class="text-sm">
+          <a href="#" class="text-gray-700 hover:text-primary">Sign in</a>
+          <span class="text-gray-400 mx-1">|</span>
+          <a href="#" class="text-gray-700 hover:text-primary">Register</a>
+        </div>
+      </div>
+
+      <!-- Cart -->
+      <a href="{% url 'cart' %}" class="relative p-2 text-gray-600 hover:text-primary transition-colors">
+        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center border">
+          <i class="fa fa-shopping-cart"></i>
+        </div>
+        {% if cart_count > 0 %}
+        <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          {{ cart_count }}
+        </span>
+        {% endif %}
+      </a>
+    </div>
+  </div>
+</div>
 </header>
+
+<style>
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+</style>
