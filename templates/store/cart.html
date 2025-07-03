@@ -1,4 +1,5 @@
 {%extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -6,7 +7,13 @@
 <div class="container">
 
 <!-- ============================ COMPONENT 1 ================================= -->
-
+{% if not cart_items %}
+<h2 class="text-center">Your Shopping Cart is Empty</h2>
+<br>
+<div class="text-center">
+    <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+</div>
+{% else %}
 <div class="row">
 	<aside class="col-lg-9">
 <div class="card">
@@ -27,8 +34,14 @@
 		<figure class="itemside align-items-center">
 			<div class="aside"><img src="{{ cart_item.product.product_image.url }}" class="img-sm"></div>
 			<figcaption class="info">
-				<a href="#" class="title text-dark">{{ cart_item.product.product_name }}</a>
-				<!-- <p class="text-muted small">Matrix: 25 Mpx <br> Brand: Canon</p> -->
+				<a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+				<p class="text-muted small">
+                    {% if cart_item.product.stock <= 0 %}
+                        <span class="text-danger">Out of Stock</span>
+                    {% else %}
+                        <span class="text-success">In Stock</span>
+                    {% endif %}
+                </p>
 			</figcaption>
 		</figure>
 	</td>
@@ -37,11 +50,11 @@
 					<div class="col"> 
 						<div class="input-group input-spinner">
 							<div class="input-group-prepend">
-							<a href="#" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-minus"></i> </a>
+							<a href="{% url 'remove_cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-minus"></i> </a>
 							</div>
-							<input type="text" class="form-control"  value="{{ cart_item.quantity }}">
+							<input type="text" class="form-control"  value="{{ cart_item.quantity }}" readonly>
 							<div class="input-group-append">
-							<a href="{% url 'add_cart' cart_item.product.id %} "class="btn btn-light" type="button" id="button-plus"> <i class="fa fa-plus"></i> </a>
+							<a href="{% url 'add_cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-plus"> <i class="fa fa-plus"></i> </a>
 							</div>
 						</div> <!-- input-group.// -->
 					</div> <!-- col.// -->
@@ -49,11 +62,11 @@
 	<td> 
 		<div class="price-wrap"> 
 			<var class="price">${{ cart_item.sub_total }}</var> 
-			<small class="text-muted"> ${{ cart_item.product.product_price }} </small> 
+			<small class="text-muted"> ${{ cart_item.product.product_price }} each </small> 
 		</div> <!-- price-wrap .// -->
 	</td>
 	<td class="text-right"> 
-	<a href="" class="btn btn-danger"> Remove</a>
+	<a href="{% url 'remove_cart_item' cart_item.product.id %}" onclick="return confirm('Are you sure you want to remove this item?')" class="btn btn-danger"> Remove</a>
 	</td>
 </tr>
 {% endfor %}
@@ -68,22 +81,22 @@
 		<div class="card-body">
 			<dl class="dlist-align">
 			  <dt>Total price:</dt>
-			  <dd class="text-right">${{total}}</dd>
+			  <dd class="text-right">${{ total|floatformat:2 }}</dd>
 			</dl>
 			<dl class="dlist-align">
 			  <dt>Tax:</dt>
-			  <dd class="text-right"> $10.00</dd>
+			  <dd class="text-right"> ${{ tax|floatformat:2 }}</dd>
 			</dl>
 			<dl class="dlist-align">
-			  <dt>Total:</dt>
-			  <dd class="text-right text-dark b"><strong>$59.97</strong></dd>
+			  <dt>Grand Total:</dt>
+			  <dd class="text-right text-dark b"><strong>${{ grand_total|floatformat:2 }}</strong></dd>
 			</dl>
 			<hr>
 			<p class="text-center mb-3">
-				<img src="{{ cart_item.product.product_image.url }}" height="26">
+				<img src="{% static 'images/misc/payments.png' %}" height="26">
 			</p>
-			<a href="./place-order.html" class="btn btn-primary btn-block"> Checkout </a>
-			<a href="./store.html" class="btn btn-light btn-block">Continue Shopping</a>
+			<a href="#" class="btn btn-primary btn-block"> Checkout </a>
+			<a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
 
@@ -91,6 +104,7 @@
 
 
 </div> <!-- row.// -->
+{% endif %}
 <!-- ============================ COMPONENT 1 END .// ================================= -->
 
 </div> <!-- container .//  -->
