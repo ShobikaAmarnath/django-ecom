@@ -7,7 +7,11 @@
 <!-- Page Header -->
 <section class="bg-gray-100 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% if 'search' in request.path %}
+    <h2 class="text-3xl font-bold text-gray-900">Search Results</h2>
+    {% else %}
     <h2 class="text-3xl font-bold text-gray-900">Our Store</h2>
+    {% endif %}
   </div>
 </section>
 
@@ -15,11 +19,11 @@
 <section class="py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col lg:flex-row gap-8">
-      
+
       <!-- Sidebar Filters -->
       <aside class="lg:w-1/4">
         <div class="bg-white rounded-lg shadow-md">
-          
+
           <!-- Categories Filter -->
           <div class="border-b border-gray-200">
             <div class="p-4">
@@ -28,9 +32,11 @@
                 Categories
               </h6>
               <ul class="space-y-2">
-                <li><a href="{% url 'store' %}" class="text-gray-600 hover:text-primary transition-colors">All Products</a></li>
+                <li><a href="{% url 'store' %}" class="text-gray-600 hover:text-primary transition-colors">All
+                    Products</a></li>
                 {% for category in links %}
-                <li><a href="{{ category.get_url }}" class="text-gray-600 hover:text-primary transition-colors">{{category.category_name}}</a></li>
+                <li><a href="{{ category.get_url }}"
+                    class="text-gray-600 hover:text-primary transition-colors">{{category.category_name}}</a></li>
                 {% endfor %}
               </ul>
             </div>
@@ -46,19 +52,23 @@
               <div class="flex flex-wrap gap-2">
                 <label class="inline-flex items-center">
                   <input type="checkbox" class="sr-only">
-                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XS</span>
+                  <span
+                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XS</span>
                 </label>
                 <label class="inline-flex items-center">
                   <input type="checkbox" class="sr-only">
-                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">SM</span>
+                  <span
+                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">SM</span>
                 </label>
                 <label class="inline-flex items-center">
                   <input type="checkbox" class="sr-only">
-                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">LG</span>
+                  <span
+                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">LG</span>
                 </label>
                 <label class="inline-flex items-center">
                   <input type="checkbox" class="sr-only">
-                  <span class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XXL</span>
+                  <span
+                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XXL</span>
                 </label>
               </div>
             </div>
@@ -73,7 +83,8 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Min</label>
-                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="0">$0</option>
                   <option value="50">$50</option>
                   <option value="100">$100</option>
@@ -85,7 +96,8 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Max</label>
-                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="50">$50</option>
                   <option value="100">$100</option>
                   <option value="150">$150</option>
@@ -96,7 +108,8 @@
                 </select>
               </div>
             </div>
-            <button class="w-full bg-primary text-white py-2 rounded-md hover:bg-blue-700 transition-colors">Apply</button>
+            <button
+              class="w-full bg-primary text-white py-2 rounded-md hover:bg-blue-700 transition-colors">Apply</button>
           </div>
         </div>
       </aside>
@@ -112,60 +125,116 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {% for product in products %}
           <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden">
+            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden relative">
               <a href="{{ product.get_url }}">
-                <img src="{{product.product_image.url}}" 
-                     alt="{{ product.product_name }}"
-                     class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+                <img src="{{product.product_image.url}}" alt="{{ product.product_name }}"
+                  class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
               </a>
             </div>
             <div class="p-4">
-              <div class="h-20 mb-4">
-                <a href="{{ product.get_url }}" class="text-lg font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2">
+              <div class="flex justify-between items-center mb-2">
+                <a href="{{ product.get_url }}"
+                  class="text-base font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2 w-2/3">
                   {{ product.product_name }}
                 </a>
-                <div class="mt-2">
-                  <span class="text-xl font-bold text-gray-900">${{product.product_price}}</span>
+                <div class="flex items-center gap-2">
+                  <!-- Wishlist Icon -->
+                   <!-- <p>Wishlist Products: {{ wishlist_products }}</p> -->
+                  <a href="{% url 'toggle_wishlist' product.id %}" title="Toggle Wishlist"
+                    class="hover:text-red-600 transition">
+                    {% if product.id in wishlist_products %}
+                    <i class="fas fa-heart text-red-600"></i>
+                    {% else %}
+                    <i class="far fa-heart text-gray-500"></i>
+                    {% endif %}
+                  </a>
+
+                  <!-- Cart / Out of Stock -->
+                  {% if product.stock > 0 %}
+                  <a href="{% url 'add_cart' product.id %}" title="Add to Cart"
+                    class="text-blue-600 hover:text-blue-800 transition">
+                    <i class="fas fa-cart-plus text-lg"></i>
+                  </a>
+                  {% else %}
+                  <span title="Out of Stock" class="text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-shopping-cart text-lg opacity-50"></i>
+                  </span>
+                  {% endif %}
                 </div>
               </div>
-              {% if product.stock <= 0 %}
-                <button class="w-full bg-gray-400 text-white py-2 rounded-md cursor-not-allowed" disabled>
-                  Out of Stock
-                </button>
-              {% else %}
-                <a href="{% url 'add_cart' product.id %}" class="block w-full bg-primary text-white text-center py-2 rounded-md hover:bg-blue-700 transition-colors">
-                  Add to cart
-                </a>
-              {% endif %}
+
+              <div class="mt-0">
+                <span class="text-lg font-bold text-gray-900">${{ product.product_price }}</span>
+              </div>
             </div>
           </div>
           {% endfor %}
         </div>
 
+
         <!-- Pagination -->
         <nav class="mt-8 flex justify-center">
+          {% if products.has_other_pages %}
           <ul class="flex items-center space-x-1">
+
+            <!-- Previous Button -->
+            {% if products.has_previous %}
             <li>
-              <a href="#" class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50">
+              <a href="?page={{ products.previous_page_number }}"
+                class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-100">
                 Previous
               </a>
             </li>
+            {% else %}
             <li>
-              <a href="#" class="px-3 py-2 text-white bg-primary border border-primary">1</a>
+              <span class="px-3 py-2 text-gray-400 bg-gray-100 border border-gray-300 rounded-l-md cursor-not-allowed">
+                Previous
+              </span>
             </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for i in products.paginator.page_range %}
+            {% if products.number == i %}
             <li>
-              <a href="#" class="px-3 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">2</a>
+              <span class="px-3 py-2 text-white bg-blue-600 border border-blue-600 font-semibold">
+                {{ i }}
+              </span>
             </li>
+            {% else %}
             <li>
-              <a href="#" class="px-3 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">3</a>
+              <a href="?page={{ i }}" class="px-3 py-2 text-blue-600 bg-white border border-gray-300 hover:bg-gray-100">
+                {{ i }}
+              </a>
             </li>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if products.has_next %}
             <li>
-              <a href="#" class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50">
+              <a href="?page={{ products.next_page_number }}"
+                class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-100">
                 Next
               </a>
             </li>
+            {% else %}
+            <li>
+              <span class="px-3 py-2 text-gray-400 bg-gray-100 border border-gray-300 rounded-r-md cursor-not-allowed">
+                Next
+              </span>
+            </li>
+            {% endif %}
+
           </ul>
+          {% endif %}
         </nav>
+
+        {% if not products %}
+        <div class="text-center text-gray-500 mt-8">
+          <p>No products found.</p>
+        </div>
+        {% endif %}
       </main>
     </div>
   </div>

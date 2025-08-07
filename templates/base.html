@@ -5,20 +5,17 @@
 <meta charset="utf-8">
 <meta http-equiv="pragma" content="no-cache" />
 <meta http-equiv="cache-control" content="max-age=604800" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>GreatKart | One of the Biggest Online Shopping Platform</title>
+<title>SMK</title>
 
-<link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
+<link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 
-<!-- Tailwind CSS -->
+<!-- Tailwind CSS via CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- jQuery -->
-<script src="{% static 'js/jquery-2.0.0.min.js' %}" type="text/javascript"></script>
-
-<!-- Font awesome 5 -->
-<link href="{% static 'fonts/fontawesome/css/all.min.css' %}" type="text/css" rel="stylesheet">
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 <!-- Custom Tailwind Config -->
 <script>
@@ -40,30 +37,15 @@
     }
 </script>
 
-<!-- custom javascript -->
-<script src="{% static 'js/script.js' %}" type="text/javascript"></script>
-
-<script type="text/javascript">
-/// some script
-
-// jquery ready start
-$(document).ready(function() {
-	// jQuery code
-
-}); 
-// jquery end
-</script>
-
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 text-gray-900">
 
     {% include 'includes/navbar.html' %}
-    <!-- section-header.// -->
-
+    
     {% block content %}
-
     {% endblock content %}
 
     {% include 'includes/footer.html' %}
+    
 </body>
 </html>

@@ -10,8 +10,9 @@ def counter(request):
             cart = Cart.objects.filter(cart_id=_cart_id(request)).first()
             if cart:
                 cart_items = CartItem.objects.filter(cart=cart)
-                for cart_item in cart_items:
-                    cart_count += cart_item.quantity
+                # for cart_item in cart_items:
+                #     cart_count += cart_item.quantity
+                cart_count = cart_items.count()
             else:
                 cart_count = 0
         except Cart.DoesNotExist:

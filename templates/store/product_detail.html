@@ -4,140 +4,114 @@
 
 <section class="py-8 bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
+
     <!-- Product Details -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
-        
+
         <!-- Product Images -->
         <div class="p-6">
           <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg">
-            <img src="{{ single_product.product_image.url }}" 
-                 alt="{{ single_product.product_name }}"
-                 class="w-full h-96 object-cover">
+            <img src="{{ single_product.product_image.url }}" alt="{{ single_product.product_name }}"
+              class="w-full h-96 object-cover">
           </div>
         </div>
 
         <!-- Product Info -->
         <div class="p-6 border-l border-gray-200">
-          <div class="space-y-6">
-            
-            <!-- Title and Price -->
-            <div>
-              <h1 class="text-3xl font-bold text-gray-900">{{single_product.product_name}}</h1>
-              <div class="mt-4">
-                <span class="text-3xl font-bold text-gray-900">${{ single_product.product_price }}</span>
+          <form action="{% url 'add_cart' single_product.id %}" method="POST">
+            {% csrf_token %}
+            <div class="space-y-6">
+
+              <!-- Title and Price -->
+              <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{single_product.product_name}}</h1>
+                <div class="mt-4">
+                  <span class="text-3xl font-bold text-gray-900">${{ single_product.product_price }}</span>
+                </div>
               </div>
-            </div>
 
-            <!-- Description -->
-            <div>
-              <p class="text-gray-600 leading-relaxed">{{ single_product.description }}</p>
-            </div>
-
-            <hr class="border-gray-200">
-
-            <!-- Color Options -->
-            <div>
-              <h6 class="text-lg font-semibold text-gray-900 mb-3">Choose Color</h6>
-              <div class="flex flex-wrap gap-2">
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_color" class="sr-only">
-                  <span class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">Silver</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_color" class="sr-only">
-                  <span class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">Gray</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_color" class="sr-only" checked>
-                  <span class="px-4 py-2 border border-primary bg-primary text-white rounded-md text-sm cursor-pointer">Gold</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_color" class="sr-only">
-                  <span class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">Black</span>
-                </label>
+              <!-- Description -->
+              <div>
+                <p class="text-gray-600 leading-relaxed">{{ single_product.description }}</p>
               </div>
-            </div>
 
-            <!-- Size Options -->
-            <div>
-              <h6 class="text-lg font-semibold text-gray-900 mb-3">Select Size</h6>
-              <div class="flex flex-wrap gap-2">
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_size" class="sr-only">
-                  <span class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">S</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_size" class="sr-only" checked>
-                  <span class="px-4 py-2 border border-primary bg-primary text-white rounded-md text-sm cursor-pointer">M</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_size" class="sr-only">
-                  <span class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">L</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="radio" name="radio_size" class="sr-only">
-                  <span class="px-4 py-2 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XL</span>
-                </label>
+              <hr class="border-gray-200">
+
+              <!-- Color Options -->
+              <div>
+                <h6 class="text-lg font-semibold text-gray-900 mb-3">Choose Color</h6>
+                <select id="color" name="radio_color"
+                  class="px-6 py-2 border border-gray-300 rounded-md text-sm focus:border-primary focus:ring-primary focus:outline-none">
+                  <option value="" disabled selected>Select Color</option>
+                  {% for i in single_product.variation_set.colors %}
+                  <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                  {% endfor %}
+                </select>
               </div>
-            </div>
 
-            <hr class="border-gray-200">
+              <!-- Size Options -->
+              <div>
+                <h6 class="text-lg font-semibold text-gray-900 mb-3">Select Size</h6>
+                <select id="size" name="radio_size"
+                  class="px-6 py-2 border border-gray-300 rounded-md text-sm focus:border-primary focus:ring-primary focus:outline-none">
+                  <option value="" disabled selected>Select Size</option>
+                  {% for i in single_product.variation_set.sizes %}
+                  <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <!-- Add to Cart -->
-            <div>
-              {% if single_product.stock <= 0 %}
-                <div class="text-center">
+              <hr class="border-gray-200">
+
+              <!-- Add to Cart -->
+              <div>
+                {% if single_product.stock <= 0 %} <div class="text-center">
                   <h5 class="text-xl font-semibold text-red-600 mb-4">Out of Stock</h5>
                   <button class="w-full bg-gray-400 text-white py-3 rounded-md cursor-not-allowed" disabled>
                     Unavailable
                   </button>
-                </div>
+              </div>
               {% else %}
-              {% if in_cart %}
-	              <a href="{% url 'cart' %}" class="btn  btn-success"> <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
-              {% else %}
-                <a href="{% url 'add_cart' single_product.id %}" 
-                   class="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
-                  <span>Add to cart</span>
-                  <i class="fas fa-shopping-cart"></i>
-                </a>
-                {% endif %}
+              <button type="submit"
+                class="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                <span>Add to cart</span>
+                <i class="fas fa-shopping-cart"></i>
+              </button>
               {% endif %}
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Customer Reviews -->
-    <div class="mt-12">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
-        
-        <div class="space-y-6">
-          <div class="flex space-x-4">
-            <img src="{% static 'images/avatars/avatar1.jpg' %}" 
-                 alt="User Avatar" 
-                 class="w-12 h-12 rounded-full object-cover">
-            <div class="flex-1">
-              <div class="flex items-center justify-between">
-                <h6 class="font-semibold text-gray-900">Mike John</h6>
-                <span class="text-sm text-gray-500">24.04.2020</span>
-              </div>
-              <div class="mt-2">
-                <p class="text-gray-600 leading-relaxed">
-                  Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip
-                </p>
-              </div>
+  <!-- Customer Reviews -->
+  <div class="mt-12">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
+
+      <div class="space-y-6">
+        <div class="flex space-x-4">
+          <img src="{% static 'images/avatars/avatar1.jpg' %}" alt="User Avatar"
+            class="w-12 h-12 rounded-full object-cover">
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h6 class="font-semibold text-gray-900">Mike John</h6>
+              <span class="text-sm text-gray-500">24.04.2020</span>
+            </div>
+            <div class="mt-2">
+              <p class="text-gray-600 leading-relaxed">
+                Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                quis nostrud exercitation ullamco laboris nisi ut aliquip
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 </section>
 

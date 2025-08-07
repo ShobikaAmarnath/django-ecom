@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'accounts',
     'store',
     'carts',
+    'wishlist',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'category.context_processors.menu_links',  # Custom context processor for categories
                 'carts.context_processors.counter',  # Custom context processor for cart counter
+                'wishlist.context_processors.wishlist_counter',  # Custom context processor for wishlist counter
+                'wishlist.context_processors.wishlist_products_ids',  # Custom context processor for wishlist product IDs
             ],
         },
     },
@@ -77,6 +80,7 @@ WSGI_APPLICATION = 'smkpro.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.Account'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -117,22 +121,39 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC' //default timezone, for this set USE_TZ = True
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+TIME_ZONE = 'Asia/Kolkata'
+USE_TZ = False
+
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    'smkpro/static',
+    BASE_DIR / 'static',
 ]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'shobipri57@gmail.com'
+EMAIL_HOST_PASSWORD = 'wqkt asai ncuw ioim'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True

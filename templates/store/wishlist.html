@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {% if not wishlist_items %}
+        <!-- Empty Wishlist -->
+        <div class="text-center py-16">
+            <div class="mb-8">
+                <i class="fas fa-heart text-6xl text-gray-300"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h2>
+            <p class="text-gray-600 mb-8">Looks like you haven't added any items yet.</p>
+            <a href="{% url 'store' %}"
+                class="bg-primary text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors">
+                Browse Products
+            </a>
+        </div>
+
+        {% else %}
+        <!-- Wishlist with Items -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+            <!-- Wishlist Items -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-900">Your Wishlist</h2>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr class="text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3">Product</th>
+                                    <th class="px-6 py-3 text-center">Status</th>
+                                    <th class="px-6 py-3 text-center">Price</th>
+                                    <th class="px-6 py-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for item in wishlist_items %}
+                                <tr class="hover:bg-gray-50">
+                                    <!-- Product Info -->
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="flex-shrink-0">
+                                                <img src="{{ item.product.product_image.url }}"
+                                                    alt="{{ item.product.product_name }}"
+                                                    class="w-16 h-16 object-cover rounded-md">
+                                            </div>
+                                            <div>
+                                                <a href="{{ item.product.get_url }}"
+                                                    class="text-lg font-medium text-gray-900 hover:text-primary transition-colors">
+                                                    {{ item.product.product_name }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Stock -->
+                                    <td class="px-6 py-4 text-center">
+                                        {% if item.product.stock > 0 %}
+                                        <span class="text-green-600 font-medium">In Stock</span>
+                                        {% else %}
+                                        <span class="text-red-600 font-medium">Out of Stock</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Price -->
+                                    <td class="px-6 py-4 text-center">
+                                        ${{ item.product.product_price }}
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="px-6 py-4 text-center space-y-2">
+                                        {% if item.product.stock > 0 %}
+                                        <a href="{{ item.product.get_url }}"
+                                            class="inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </a>
+                                        {% endif %}
+                                        <a href="{% url 'remove_from_wishlist' item.product.id %}"
+                                            class="inline-flex items-center justify-center gap-2 bg-red-100 text-red-600 px-4 py-2 rounded hover:bg-red-200 transition">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Wishlist Summary</h3>
+
+                    <div class="flex justify-between text-gray-700 mb-4">
+                        <span>Total Items:</span>
+                        <span class="font-bold">{{ wishlist_items|length }}</span>
+                    </div>
+
+                    <div class="text-center mb-6">
+                        <img src="{% static 'images/misc/payments.png' %}" alt="Payment Methods" class="h-6 mx-auto">
+                    </div>
+
+                    <div class="space-y-3">
+                        <a href="{% url 'store' %}"
+                            class="w-full bg-gray-100 text-gray-700 py-3 rounded-md hover:bg-gray-200 transition-colors text-center block">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
