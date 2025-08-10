@@ -5,6 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from carts.models import Cart, CartItem
 from store.models import Product, Variation
 
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
 def _cart_id(request): #private function
@@ -42,14 +44,16 @@ def add_cart(request, product_id):
         cart.save()
 
     # Check if cart item with same variations exists
-    cart_items = CartItem.objects.filter(product=product, cart=cart)
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(product=product, user=request.user)
+    else:
+        cart_items = CartItem.objects.filter(product=product, cart=cart)
     existing_item = None
+    current_variation_ids = sorted([v.id for v in product_variation])
 
     for item in cart_items:
-        existing_variations = item.variations.all().order_by('id')
-        current_variations = sorted(product_variation, key=lambda x: x.id)
-
-        if list(existing_variations) == current_variations:
+        existing_variation_ids = sorted([v.id for v in item.variations.all()])
+        if existing_variation_ids == current_variation_ids:
             existing_item = item
             break
 
@@ -61,7 +65,8 @@ def add_cart(request, product_id):
         cart_item = CartItem.objects.create(
             product=product,
             quantity=1,
-            cart=cart
+            user=request.user if request.user.is_authenticated else None,
+            cart=None if request.user.is_authenticated else cart
         )
         if len(product_variation) > 0:
             cart_item.variations.set(product_variation)
@@ -71,37 +76,61 @@ def add_cart(request, product_id):
 
 
 def remove_cart(request, product_id):
-    cart = Cart.objects.get(cart_id=_cart_id(request))
     product = get_object_or_404(Product, id=product_id)
-    try:
-        cart_item = CartItem.objects.get(product=product, cart=cart)
+
+    if request.user.is_authenticated:
+        try:
+            cart_item = CartItem.objects.get(product=product, user=request.user)
+        except CartItem.DoesNotExist:
+            cart_item = None
+    else:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        try:
+            cart_item = CartItem.objects.get(product=product, cart=cart)
+        except CartItem.DoesNotExist:
+            cart_item = None
+
+    if cart_item:
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
             cart_item.save()
         else:
             cart_item.delete()
-    except:
-        pass
+
     return redirect('cart')
 
 
-def remove_cart_item(request, product_id):
-    cart = Cart.objects.get(cart_id=_cart_id(request))
-    product = get_object_or_404(Product, id=product_id)
+from django.views.decorators.http import require_POST
+
+@require_POST
+def remove_cart_item(request, item_id):
     try:
-        cart_item = CartItem.objects.get(product=product, cart=cart)
-        cart_item.delete()
-    except:
-        pass
-    return redirect('cart')
+        cart_item = CartItem.objects.get(id=item_id)
+    except CartItem.DoesNotExist:
+        return redirect('cart')
 
+    if request.user.is_authenticated:
+        if cart_item.user == request.user:
+            cart_item.delete()
+    else:
+        try:
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+            if cart_item.cart == cart:
+                cart_item.delete()
+        except Cart.DoesNotExist:
+            pass
+
+    return redirect('cart')
 
 def cart(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0
         grand_total = 0
-        cart = Cart.objects.get(cart_id=_cart_id(request))
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        if request.user.is_authenticated:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        else:
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         for cart_item in cart_items:
             total += (cart_item.product.product_price * cart_item.quantity)
             quantity += cart_item.quantity
@@ -122,8 +151,39 @@ def cart(request, total=0, quantity=0, cart_items=None):
         'tax': tax,
         'grand_total': grand_total,
         'cart_count': cart_items.count() if cart_items else 0,
-        'tax': tax,
-        'grand_total': grand_total,
     }
 
     return render(request, 'store/cart.html', context)
+
+@login_required(login_url= 'login')
+def checkout(request, total=0, quantity=0, cart_items=None):
+    try:
+        tax = 0
+        grand_total = 0
+        if request.user.is_authenticated:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        else:
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        for cart_item in cart_items:
+            total += (cart_item.product.product_price * cart_item.quantity)
+            quantity += cart_item.quantity
+
+        tax = (2 * total) / 100  # Assuming a tax rate of 2%
+        grand_total = total + tax
+
+    except Cart.DoesNotExist:
+        tax = (2 * total)/100
+        grand_total = total + tax
+    except ObjectDoesNotExist:
+        pass
+
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items,
+        'tax': tax,
+        'grand_total': grand_total,
+        'cart_count': cart_items.count() if cart_items else 0,
+    }
+    return render(request, 'store/checkout.html', context)

@@ -5,16 +5,18 @@ def wishlist_counter(request):
     wishlist_count = 0
     if 'admin' in request.path:
         return {}
-    else:
-        try:
+    
+    try:
+        if request.user.is_authenticated:
+            wishlist_items = WishlistItem.objects.filter(user=request.user, is_active=True)
+        else:
             wishlist = Wishlist.objects.filter(wishlist_id=_wishlist_id(request)).first()
-            if wishlist:
-                wishlist_items = WishlistItem.objects.filter(wishlist=wishlist, is_active=True)
-                wishlist_count = wishlist_items.count()
-            else:
-                wishlist_count = 0
-        except Wishlist.DoesNotExist:
-            wishlist_count = 0
+            wishlist_items = WishlistItem.objects.filter(wishlist=wishlist, is_active=True) if wishlist else []
+        
+        wishlist_count = wishlist_items.count()
+    except:
+        wishlist_count = 0
+    
     return dict(wishlist_count=wishlist_count)
 
 def wishlist_products_ids(request):

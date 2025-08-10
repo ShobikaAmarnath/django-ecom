@@ -12,10 +12,11 @@ def _wishlist_id(request):
 
 # ✅ Show wishlist page
 def wishlist(request):
-    wishlist_id = _wishlist_id(request)
-    wishlist_obj, created = Wishlist.objects.get_or_create(wishlist_id=wishlist_id)
-
-    items = WishlistItem.objects.filter(wishlist=wishlist_obj, is_active=True)
+    if request.user.is_authenticated:
+        items = WishlistItem.objects.filter(user=request.user, is_active=True)
+    else:
+        wishlist_obj, _ = Wishlist.objects.get_or_create(wishlist_id=_wishlist_id(request))
+        items = WishlistItem.objects.filter(wishlist=wishlist_obj, is_active=True)
 
     context = {
         'wishlist_items': items,
@@ -27,27 +28,40 @@ def wishlist(request):
 # ➕ Add item to wishlist
 def add_to_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    wishlist_obj, _ = Wishlist.objects.get_or_create(wishlist_id=_wishlist_id(request))
-
-    WishlistItem.objects.get_or_create(product=product, wishlist=wishlist_obj, is_active=True)
+    if request.user.is_authenticated:
+        WishlistItem.objects.get_or_create(product=product, user=request.user, is_active=True)
+    else:
+        wishlist_obj, _ = Wishlist.objects.get_or_create(wishlist_id=_wishlist_id(request))
+        WishlistItem.objects.get_or_create(product=product, wishlist=wishlist_obj, is_active=True)
     return redirect(request.META.get('HTTP_REFERER', 'store'))
 
 
 # ❌ Remove item from wishlist
-def remove_from_wishlist(request, product_id):
-    wishlist_id = _wishlist_id(request)
-    wishlist_obj = get_object_or_404(Wishlist, wishlist_id=wishlist_id)
+from django.views.decorators.http import require_POST
 
-    WishlistItem.objects.filter(product_id=product_id, wishlist=wishlist_obj).delete()
+@require_POST
+def remove_from_wishlist(request, item_id):
+    try:
+        item = WishlistItem.objects.get(id=item_id)
+    except WishlistItem.DoesNotExist:
+        return redirect(request.META.get('HTTP_REFERER', 'store'))
+
+    if request.user.is_authenticated and item.user == request.user:
+        item.delete()
+    elif not request.user.is_authenticated and item.wishlist.wishlist_id == _wishlist_id(request):
+        item.delete()
+
     return redirect(request.META.get('HTTP_REFERER', 'store'))
-
 
 # 🔁 Toggle wishlist (add if not in, remove if already in)
 def toggle_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    wishlist_obj, _ = Wishlist.objects.get_or_create(wishlist_id=_wishlist_id(request))
-
-    item, created = WishlistItem.objects.get_or_create(product=product, wishlist=wishlist_obj, is_active=True)
+    
+    if request.user.is_authenticated:
+        item, created = WishlistItem.objects.get_or_create(product=product, user=request.user, is_active=True)
+    else:
+        wishlist_obj, _ = Wishlist.objects.get_or_create(wishlist_id=_wishlist_id(request))
+        item, created = WishlistItem.objects.get_or_create(product=product, wishlist=wishlist_obj, is_active=True)
 
     if not created:
         item.delete()

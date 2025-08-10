@@ -3,9 +3,8 @@ from django.shortcuts import render
 from store.models import Product
 
 def home(request):
-    products = Product.objects.all().filter(is_available=True).order_by('id')
-
+    latest_products = Product.objects.order_by('-created_date')[:6]
     context = {
-        'products': products,
+        'products': latest_products,
     }
     return render(request, 'home.html', context)

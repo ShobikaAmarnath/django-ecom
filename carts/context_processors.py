@@ -5,16 +5,16 @@ def counter(request):
     cart_count = 0
     if 'admin' in request.path:
         return {}
-    else:
-        try:
+    
+    try:
+        if request.user.is_authenticated:
+            cart_items = CartItem.objects.filter(user=request.user)
+        else:
             cart = Cart.objects.filter(cart_id=_cart_id(request)).first()
-            if cart:
-                cart_items = CartItem.objects.filter(cart=cart)
-                # for cart_item in cart_items:
-                #     cart_count += cart_item.quantity
-                cart_count = cart_items.count()
-            else:
-                cart_count = 0
-        except Cart.DoesNotExist:
-            cart_count = 0
+            cart_items = CartItem.objects.filter(cart=cart) if cart else []
+        
+        cart_count = sum(item.quantity for item in cart_items)
+    except:
+        cart_count = 0
+    
     return dict(cart_count=cart_count)

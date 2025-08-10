@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="py-8 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+      <!-- Recheck Details -->
+      <div class="lg:col-span-3 space-y-6">
+
+        <!-- Billing Address Preview -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Billing Address</h2>
+          <div class="text-gray-700 space-y-1">
+            <p>{{ order.first_name }} {{ order.last_name }}</p>
+            <p>{{ order.address_line_1 }}</p>
+            <p>{{ order.city }}, {{ order.state }}</p>
+            <p>{{ order.country }}</p>
+            <p>Email: {{ order.email }}</p>
+            <p>Phone: {{ order.phone }}</p>
+            {% if order.order_note %}
+            <p class="italic text-gray-500">Note: {{ order.order_note }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
+          <p class="text-gray-700">{{ payment_method|default:"Not Selected" }}</p>
+        </div>
+
+        <!-- Ordered Products -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Ordered Products</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full border border-gray-200 rounded-md">
+              <thead class="bg-gray-50">
+                <tr class="text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-4 py-3">Product</th>
+                  <th class="px-4 py-3 text-center">Quantity</th>
+                  <th class="px-4 py-3 text-center">Price</th>
+                  <th class="px-4 py-3 text-center">Total</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {% for item in cart_items %}
+                <tr>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center space-x-4">
+                      <img src="{{ item.product.product_image.url }}" class="w-12 h-12 object-cover rounded">
+                      <div>
+                        <p class="font-medium">{{ item.product.product_name }}</p>
+                        {% for variation in item.variations.all %}
+                        <p class="text-sm text-gray-500">
+                          {{ variation.variation_category|capfirst }}: {{ variation.variation_value|capfirst }}
+                        </p>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3 text-center">{{ item.quantity }}</td>
+                  <td class="px-4 py-3 text-center">${{ item.product.product_price|floatformat:2 }}</td>
+                  <td class="px-4 py-3 text-center">${{ item.sub_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+
+          <div class="space-y-3 mb-6">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Subtotal:</span>
+              <span class="font-medium">${{ total|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Tax:</span>
+              <span class="font-medium">${{ tax|floatformat:2 }}</span>
+            </div>
+            <hr class="border-gray-200">
+            <div class="flex justify-between text-lg font-bold">
+              <span>Total:</span>
+              <span>${{ grand_total|floatformat:2 }}</span>
+            </div>
+          </div>
+
+          <!-- Payment Icons -->
+          <div class="text-center mb-6">
+            <img src="{% static 'images/misc/payments.png' %}" alt="Payment Methods" class="h-6 mx-auto">
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+              <input type="hidden" name="payment_method" value="{{ payment_method }}">
+              <button type="submit"
+                class="w-full bg-primary text-white py-3 rounded-md hover:bg-blue-700 transition-colors text-center block">
+                Make Payment
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
