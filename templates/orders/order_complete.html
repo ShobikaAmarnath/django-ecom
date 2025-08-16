@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto mt-12">
+
+    {% include 'includes/alerts.html' %}
+  <!-- Success Icon -->
+  <div class="flex justify-center">
+    <i class="fas fa-check-circle text-green-600 text-7xl mb-5"></i>
+  </div>
+  <h2 class="text-center text-2xl font-bold">Payment Successful</h2>
+
+  <!-- Shop More Button -->
+  <div class="text-center mt-4">
+    <a href="{% url 'store' %}" 
+       class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition">
+      Shop more
+    </a>
+  </div>
+</div>
+
+<!-- Invoice Section -->
+<div class="max-w-3xl mx-auto bg-gray-100 p-10 my-12 rounded-md shadow-md">
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+    <!-- Logo -->
+    <div>
+      <img src="/images/logo.png" alt="Invoice logo" class="h-10">
+    </div>
+    <!-- Invoiced To -->
+    <div class="text-right">
+      <p class="font-semibold">Invoiced To</p>
+      <p>{{ order.full_name }}</p>
+      <p>{{ order.address_line_1 }}</p>
+      <p>{{ order.city }}, {{ order.state }}</p>
+      <p>{{ order.country }}</p>
+    </div>
+  </div>
+
+  <!-- Order Details -->
+  <div class="bg-white p-4 rounded-md shadow mb-6">
+    <ul class="space-y-1">
+      <li><span class="font-semibold">Order: </span>{{ order_number }}</li>
+      <li><span class="font-semibold">Transaction: </span>{{ trans_ID }}</li>
+      <li><span class="font-semibold">Order Date: </span>{{ order.created_at }}</li>
+      <li><span class="font-semibold">Status: </span> <span class="text-green-600 font-bold">{{ payment.status }}</span></li>
+    </ul>
+  </div>
+
+  <!-- Items Table -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full border border-gray-300 text-sm">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-4 py-2 text-left">Product</th>
+          <th class="px-4 py-2 text-center">Product Price</th>
+          <th class="px-4 py-2 text-center">Quantity</th>
+          <th class="px-4 py-2 text-center">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in ordered_products %}
+        <tr class="border-t border-gray-300">
+          <td class="px-4 py-2">
+            {{ item.product.product_name | capfirst }}
+            <p>
+              {% if cart_item.variations.all %}
+                {% for item in cart_item.variations.all %}
+                  {{ item.variation_category | capfirst }} : {{ item.variation_value | capfirst }} <br/>
+                {% endfor %}
+              {% endif %}
+            </p>
+          </td>
+          <td class="px-4 py-2 text-center">${{ item.product.product_price }}</td>
+          <td class="px-4 py-2 text-center">{{ item.quantity }}</td>
+          <td class="px-4 py-2 text-center">${{ item.product_line_price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="bg-gray-50">
+        <tr class="border-t border-gray-300">
+          <th colspan="3" class="px-4 py-2 text-right">Sub Total:</th>
+          <th class="px-4 py-2 text-center">${{ subtotal }}</th>
+        </tr>
+        <tr class="border-t border-gray-300">
+          <th colspan="3" class="px-4 py-2 text-right">Tax:</th>
+          <th class="px-4 py-2 text-center">${{ order.tax }}</th>
+        </tr>
+        <tr class="border-t border-gray-300">
+          <th colspan="3" class="px-4 py-2 text-right">Grand Total:</th>
+          <th class="px-4 py-2 text-center">${{ order.order_total }}</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+<!-- Add message auto-dismiss script -->
+<script>
+  setTimeout(() => {
+    const container = document.getElementById("messages-container");
+    if (container) {
+      container.classList.add("opacity-0");
+      setTimeout(() => container.remove(), 300);
+    }
+  }, 5000);
+</script>
+
+{% endblock %}

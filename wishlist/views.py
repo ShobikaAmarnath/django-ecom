@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from store.models import Product
 from wishlist.models import Wishlist, WishlistItem
-
+from django.contrib import messages
 
 def _wishlist_id(request):
     wishlist = request.session.session_key

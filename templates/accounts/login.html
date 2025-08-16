@@ -73,4 +73,15 @@
   {% endif %}
 </section>
 
+<!-- Add message auto-dismiss script -->
+<script>
+  setTimeout(() => {
+    const container = document.getElementById("messages-container");
+    if (container) {
+      container.classList.add("opacity-0");
+      setTimeout(() => container.remove(), 300);
+    }
+  }, 5000);
+</script>
+
 {% endblock %}

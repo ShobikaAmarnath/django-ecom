@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.contrib import messages
 
 from carts.models import CartItem
 from carts.views import _cart_id

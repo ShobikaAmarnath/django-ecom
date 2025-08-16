@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 
 from carts.models import Cart, CartItem
 from store.models import Product, Variation
