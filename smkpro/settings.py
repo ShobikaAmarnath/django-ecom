@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -97,6 +98,11 @@ DATABASES = {
         'PORT': config("DB_PORT", cast=int),
     }
 }
+
+# If DATABASE_URL is set (on Render), override with it
+DATABASE_URL = config("DATABASE_URL", default="")
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 
 
 # Password validation
