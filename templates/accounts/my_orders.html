@@ -1,0 +1,51 @@
+{% block content %}
+<section class="py-10 bg-gray-100">
+  <div class="container mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">My Orders</h2>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-primary text-white">
+            <th class="p-4 text-left">Order #</th>
+            <th class="p-4">Date</th>
+            <th class="p-4">Payment</th>
+            <th class="p-4">Total</th>
+            <th class="p-4">Status</th>
+            <th class="p-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for order in orders %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="p-4 font-medium text-gray-800">#{{ order.order_number }}</td>
+            <td class="p-4">{{ order.created_at|date:"M d, Y" }}</td>
+            <td class="p-4">{{ order.payment.payment_method }}</td>
+            <td class="p-4 font-semibold">${{ order.order_total }}</td>
+            <td class="p-4">
+              <span class="
+                px-3 py-1 rounded-full text-xs font-semibold
+                {% if order.status == 'Completed' %} bg-green-100 text-green-700
+                {% elif order.status == 'Pending' %} bg-yellow-100 text-yellow-700
+                {% elif order.status == 'Cancelled' %} bg-red-100 text-red-700
+                {% else %} bg-gray-100 text-gray-700 {% endif %}
+              ">
+                {{ order.status }}
+              </span>
+            </td>
+            <td class="p-4">
+              <a href="{% url 'order_detail' order.order_number %}" 
+                 class="text-blue-600 hover:underline font-medium">View</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="p-6 text-center text-gray-500">No orders yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

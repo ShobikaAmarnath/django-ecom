@@ -1,0 +1,71 @@
+{% extends "accounts/dashboard.html" %}
+
+{% block dashboard_content %}
+<h2 class="text-2xl font-semibold mb-6">Edit Profile</h2>
+
+<form method="post" enctype="multipart/form-data" class="space-y-6">
+  {% csrf_token %}
+
+  <!-- Profile Picture -->
+  <div class="flex items-center space-x-6">
+    <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-100 shadow">
+      {% if user_profile.profile_picture %}
+        <img src="{{ user_profile.profile_picture.url }}" class="w-full h-full object-cover">
+      {% else %}
+        <span class="flex items-center justify-center h-full text-3xl font-bold text-gray-400">
+          {{ request.user.first_name|slice:":1" }}
+        </span>
+      {% endif %}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">Change Profile Picture</label>
+      {{ profile_form.profile_picture }}
+    </div>
+  </div>
+
+  <!-- Account Info -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-gray-600 mb-1">First Name</label>
+      {{ form.first_name }}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">Last Name</label>
+      {{ form.last_name }}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">Phone Number</label>
+      {{ form.phone_number }}
+    </div>
+  </div>
+
+  <!-- Address Info -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-gray-600 mb-1">Address Line 1</label>
+      {{ profile_form.address_line_1 }}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">Address Line 2</label>
+      {{ profile_form.address_line_2 }}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">City</label>
+      {{ profile_form.city }}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">State</label>
+      {{ profile_form.state }}
+    </div>
+    <div>
+      <label class="block text-gray-600 mb-1">Country</label>
+      {{ profile_form.country }}
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+    Save Changes
+  </button>
+</form>
+{% endblock %}

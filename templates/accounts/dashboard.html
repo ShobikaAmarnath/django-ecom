@@ -6,117 +6,25 @@
 
 <section class="py-10 bg-gray-100">
 
-    {% include 'includes/alerts.html' %}
+  {% include 'includes/alerts.html' %}
 
-  <div class="container mx-auto px-4">
-    <div class="flex flex-col md:flex-row gap-6">
-      
+  <div class="container mx-auto py-10">
+    <div class="flex gap-6">
+
       <!-- Sidebar -->
-      <aside class="w-full md:w-1/4 bg-white rounded-lg shadow-md p-4 space-y-2">
+      <aside class="w-1/4 bg-white shadow rounded-lg p-4">
         <ul class="space-y-2">
-          <li><a href="#" class="block px-4 py-2 bg-blue-600 text-white rounded">My order history</a></li>
-          <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">Transactions</a></li>
-          <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">Return and refunds</a></li>
-          <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">Settings</a></li>
-          <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">My Selling Items</a></li>
-          <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">Received orders</a></li>
+          <li><a href="{% url 'my_orders' %}" class="block px-3 py-2 hover:bg-gray-100 rounded">My Orders</a></li>
+          <li><a href="{% url 'edit_profile' %}" class="block px-3 py-2 hover:bg-gray-100 rounded">Edit Profile</a></li>
+          <li><a href="{% url 'change_password' %}" class="block px-3 py-2 hover:bg-gray-100 rounded">Change Password</a></li>
         </ul>
       </aside>
 
-      <!-- Main Content -->
-      <main class="w-full md:w-3/4 space-y-6">
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <div class="p-6 border-b flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm text-gray-700">
-            <strong>Order ID: 6123456789</strong>
-            <span>Order Date: 16 December 2018</span>
-          </div>
-
-          <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h6 class="text-gray-500 font-semibold mb-2">Delivery to</h6>
-              <p class="text-gray-700 text-sm leading-relaxed">
-                Michael Jackson <br>
-                Phone: +1234567890 <br>
-                Email: myname@pixsellz.com <br>
-                Location: Home number, Building name, Street 123, Tashkent, UZB <br>
-                P.O. Box: 100123
-              </p>
-            </div>
-            <div>
-              <h6 class="text-gray-500 font-semibold mb-2">Payment</h6>
-              <p class="text-green-600 flex items-center gap-2 mb-2">
-                <i class="fab fa-cc-visa fa-lg"></i>
-                Visa **** 4216
-              </p>
-              <p class="text-gray-700 text-sm">
-                Subtotal: $356 <br>
-                Shipping fee: $56 <br>
-                <span class="font-bold">Total: $456</span>
-              </p>
-            </div>
-          </div>
-
-          <!-- Product List -->
-          <div class="overflow-x-auto">
-            <table class="w-full table-auto text-sm text-left">
-              <thead class="bg-gray-50">
-                <tr class="text-gray-600">
-                  <th class="p-4">Item</th>
-                  <th class="p-4">Product</th>
-                  <th class="p-4">Seller</th>
-                  <th class="p-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y">
-                <tr class="bg-white">
-                  <td class="p-4">
-                    <img src="../images/items/1.jpg" alt="" class="w-16 h-16 object-cover rounded border">
-                  </td>
-                  <td class="p-4">
-                    <p class="font-medium text-gray-800">Product name goes here</p>
-                    <p class="text-gray-500">USD 145</p>
-                  </td>
-                  <td class="p-4">Nike clothing</td>
-                  <td class="p-4 space-x-2">
-                    <a href="#" class="px-3 py-1 border border-blue-500 text-blue-500 rounded hover:bg-blue-50">Track order</a>
-                    <a href="#" class="px-3 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-100">Details</a>
-                  </td>
-                </tr>
-
-                <tr class="bg-white">
-                  <td class="p-4">
-                    <img src="../images/items/2.jpg" alt="" class="w-16 h-16 object-cover rounded border">
-                  </td>
-                  <td class="p-4">
-                    <p class="font-medium text-gray-800">Another name goes here</p>
-                    <p class="text-gray-500">USD 15</p>
-                  </td>
-                  <td class="p-4">ABC shop</td>
-                  <td class="p-4 space-x-2">
-                    <a href="#" class="px-3 py-1 border border-blue-500 text-blue-500 rounded hover:bg-blue-50">Track order</a>
-                    <a href="#" class="px-3 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-100">Details</a>
-                  </td>
-                </tr>
-
-                <tr class="bg-white">
-                  <td class="p-4">
-                    <img src="../images/items/3.jpg" alt="" class="w-16 h-16 object-cover rounded border">
-                  </td>
-                  <td class="p-4">
-                    <p class="font-medium text-gray-800">The name of the product goes here</p>
-                    <p class="text-gray-500">USD 145</p>
-                  </td>
-                  <td class="p-4">Wallmart</td>
-                  <td class="p-4 space-x-2">
-                    <a href="#" class="px-3 py-1 border border-blue-500 text-blue-500 rounded hover:bg-blue-50">Track order</a>
-                    <a href="#" class="px-3 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-100">Details</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div> <!-- End of card -->
+      <!-- Content Area -->
+      <main class="w-3/4 bg-white shadow rounded-lg p-6">
+        {% block dashboard_content %}
+        {% include "accounts/my_orders.html" %}
+        {% endblock %}
       </main>
 
     </div>

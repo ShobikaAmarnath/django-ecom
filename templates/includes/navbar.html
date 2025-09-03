@@ -1,5 +1,7 @@
 {% load static %}
 
+{% load custom_filters %}
+
 <header class="bg-white shadow-sm">
 
   <!-- Main Header -->
@@ -23,7 +25,8 @@
           </button>
           <div class="dropdown-menu absolute hidden bg-white shadow-lg rounded-md mt-1 py-2 w-48 z-50">
             {% for category in links %}
-            <a class="block px-4 py-2 text-gray-800 hover:bg-gray-100" href="{{ category.get_url }}">{{ category.category_name }}</a>
+            <a class="block px-4 py-2 text-gray-800 hover:bg-gray-100" href="{{ category.get_url }}">
+              {{ category.category_name }}</a>
             {% endfor %}
           </div>
         </div>
@@ -63,14 +66,30 @@
           </div>
         </div>
         {% else %}
-        <div class="text-right">
-          <div class="text-xs text-gray-500">Welcome {{user.first_name}}!</div>
-          <div class="text-sm">
-            <a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-primary">Dashboard</a>
-            <span class="text-gray-400 mx-1">|</span>
-            <a href="{% url 'logout' %}" class="text-gray-700 hover:text-primary">Logout</a>
+        <div class="relative group">
+          <!-- Avatar -->
+          <div class="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
+            {% if user.userprofile.profile_picture %}
+            <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture"
+              class="w-full h-full object-cover">
+            {% else %}
+            <img src="{{ user|ui_avatar:100 }}" alt="Default Avatar" class="w-full h-full object-cover">
+            {% endif %}
+          </div>
+
+          <!-- Dropdown -->
+          <div class="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg hidden group-hover:block z-50">
+            <div class="px-4 py-3 border-b">
+              <p class="font-medium text-gray-800">{{ user.first_name }} {{ user.last_name }}</p>
+              <p class="text-sm text-gray-500">{{ user.email }}</p>
+            </div>
+            <ul class="py-2">
+              <li><a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a></li>
+              <li><a href="{% url 'logout' %}" class="block px-4 py-2 hover:bg-gray-100 text-red-500">Logout</a></li>
+            </ul>
           </div>
         </div>
+
         {% endif %}
 
         <!-- Wishlist -->

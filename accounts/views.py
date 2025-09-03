@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
-from accounts.models import Account
+from accounts.models import Account, UserProfile
 from carts.models import Cart, CartItem
 from carts.views import _cart_id
+from orders.models import Order
 from wishlist.models import Wishlist, WishlistItem
 from wishlist.views import _wishlist_id
-from .forms import RegistrationForm
+from .forms import RegistrationForm, EditProfileForm, UserProfileForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 import requests
@@ -222,3 +223,70 @@ def resetPassword(request):
         
     else:
         return render(request, 'accounts/resetPassword.html')
+
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    context = {'orders': orders}
+    print("ORDERS are here : ", context)
+    return render(request, 'accounts/dashboard.html', context)
+
+def dashboard(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'accounts/dashboard.html', context)
+
+def order_detail(request, order_id):
+    print("ORDER ID : ", order_id)
+    order = Order.objects.get(order_number=order_id, user=request.user)
+    ordered_products = order.orderproduct_set.all()
+
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+    }
+    print("ORDER DETAILS : ", ordered_products)
+    return render(request, 'accounts/order_detail.html', context)
+
+@login_required
+def edit_profile(request):
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+
+        if form.is_valid() and profile_form.is_valid():
+            form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated successfully.")
+            return redirect('dashboard')
+    else:
+        form = EditProfileForm(instance=request.user)
+        profile_form = UserProfileForm(instance=user_profile)
+
+    context = {
+        'form': form,
+        'profile_form': profile_form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'accounts/edit_profile.html', context)
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Important: keep the user logged in after password change
+            update_session_auth_hash(request, user)
+            messages.success(request, "Your password has been updated successfully.")
+            return redirect('dashboard')
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    context = {'form': form}
+    return render(request, 'accounts/change_password.html', context)

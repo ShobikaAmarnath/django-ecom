@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account
+from .models import Account, UserProfile
 
 class RegistrationForm(forms.ModelForm):
 
@@ -44,3 +44,39 @@ class RegistrationForm(forms.ModelForm):
             }),
             label='Confirm Password'
         )
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ["first_name", "last_name", "phone_number"]
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "last_name": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "phone_number": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+        }
+        labels = {
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "phone_number": "Phone Number",
+        }
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ["address_line_1", "address_line_2", "city", "state", "country", "profile_picture"]
+        widgets = {
+            "address_line_1": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "address_line_2": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "city": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "state": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "country": forms.TextInput(attrs={"class": "border rounded p-2 w-full"}),
+            "profile_picture": forms.ClearableFileInput(attrs={"class": "border rounded p-2 w-full"}),
+        }
+        labels = {
+            "address_line_1": "Address Line 1",
+            "address_line_2": "Address Line 2",
+            "city": "City",
+            "state": "State",
+            "country": "Country",
+            "profile_picture": "Profile Picture",
+        }
