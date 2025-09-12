@@ -54,7 +54,7 @@
 
                   <!-- Cart / Out of Stock -->
                   {% if product.stock > 0 %}
-                  <a href="{% url 'add_cart' product.id %}" title="Add to Cart"
+                  <a href="{{ product.get_url }}" title="Add to Cart"
                     class="text-blue-600 hover:text-blue-800 transition">
                     <i class="fas fa-cart-plus text-lg"></i>
                   </a>

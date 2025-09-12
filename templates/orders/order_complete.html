@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block content %}
 
 <div class="max-w-5xl mx-auto mt-12">
@@ -47,7 +49,7 @@
   <div class="flex flex-col md:flex-row justify-between items-center mb-6">
     <!-- Logo -->
     <div>
-      <img src="/images/logo.png" alt="Invoice logo" class="h-10">
+      <img src="{% static 'images/logo.jpg' %}" alt="Invoice logo" class="h-20 w-auto">
     </div>
     <!-- Invoiced To -->
     <div class="text-right">
@@ -89,7 +91,7 @@
             <p>
               {% if item.variations.all %}
                 {% for v in item.variations.all %}
-                  {{ v.variation_category | capfirst }} : {{ v.variation_value | capfirst }} <br/>
+                  {{ v.category.name | capfirst }} : {{ v.value | capfirst }} <br/>
                 {% endfor %}
               {% endif %}
             </p>
