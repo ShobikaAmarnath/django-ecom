@@ -24,13 +24,15 @@ def add_cart(request, product_id):
         print("Request POST data:", request.POST)
 
         for key, value in request.POST.items():
-            if key.startswith('radio_') and value:
-                variation_category = key.replace('radio_', '')
+            print(f"Key: {key}, Value: {value}")
+            if key.startswith('variation_') and value:
+                variation_category = key.replace('variation_', '')
+                print(f"Processing variation - Category: {variation_category}, Value: {value}")
                 try:
                     variation = Variation.objects.get(
                         product=product,
-                        variation_category__iexact=variation_category,
-                        variation_value__iexact=value
+                        category__name__iexact=variation_category,
+                        value__iexact=value
                     )
                     product_variation.append(variation)
                     print(f"Added variation: {variation}")

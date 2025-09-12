@@ -28,10 +28,23 @@
           </div>
         </div>
 
-        <!-- Payment Method -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
-          <p class="text-gray-700">{{ payment_method|default:"Not Selected" }}</p>
+        <!-- Payment Options -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Select Payment Method</h2>
+          <div class="space-y-3">
+            <label class="flex items-center space-x-2">
+              <input type="radio" name="payment_option" value="paypal" checked>
+              <span>Pay with PayPal</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="radio" name="payment_option" value="upi">
+              <span>Pay with UPI (GPay, PhonePe, Paytm)</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="radio" name="payment_option" value="cod">
+              <span>Cash on Delivery</span>
+            </label>
+          </div>
         </div>
 
         <!-- Ordered Products -->
@@ -57,7 +70,7 @@
                         <p class="font-medium">{{ item.product.product_name }}</p>
                         {% for variation in item.variations.all %}
                         <p class="text-sm text-gray-500">
-                          {{ variation.variation_category|capfirst }}: {{ variation.variation_value|capfirst }}
+                          {{ variation.category.name | capfirst }}: {{ variation.value | capfirst }}
                         </p>
                         {% endfor %}
                       </div>
@@ -96,18 +109,133 @@
             </div>
           </div>
 
-          <!-- Payment Icons -->
-          <!-- <div class="text-center mb-6">
-            <img src="{% static 'images/misc/payments.png' %}" alt="Payment Methods" class="h-6 mx-auto">
-          </div> -->
-
           <!-- Action Buttons -->
           <script
-            src="https://www.paypal.com/sdk/js?client-id=AV_AByJjFGx3H95afZW-W6e1abIWT6UYEwZS3DszLjIvC7poT9Hv-mfTq6mZw_vupp7UlEmofvGVUb56&currency=USD"></script>
+            src="https://www.paypal.com/sdk/js?client-id=AV_AByJjFGx3H95afZW-W6e1abIWT6UYEwZS3DszLjIvC7poT9Hv-mfTq6mZw_vupp7UlEmofvGVUb56&currency=USD">
+            </script>
 
-          <div id="paypal-button-container"></div>
+          <div id="paypal-container" class="payment-method">
+            <div id="paypal-button-container"></div>
+          </div>
+
+          <!-- UPI Payment Section -->
+          <div id="upi-container" class="mt-4 payment-method hidden text-center">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Pay with UPI</h3>
+
+            <!-- Mobile: UPI Button -->
+            <div id="upi-mobile" class="hidden">
+              <a id="upi-link" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                href="#">
+                Pay with UPI App
+              </a>
+            </div>
+
+            <!-- Desktop: QR Code -->
+            <div id="upi-desktop" class="hidden text-center">
+              <p class="text-gray-600 mb-2">Scan this QR code with your UPI app:</p>
+              <img id="upi-qr" class="mx-auto border p-2 rounded-lg shadow" alt="UPI QR Code" />
+            </div>
+
+            <button onclick="handleUPI()" class="bg-blue-600 text-white px-4 py-2 rounded">
+              I Have Paid
+            </button>
+          </div>
+
+          <div id="cod-container" class="payment-method hidden text-center">
+            <button class="bg-green-600 text-white px-4 py-2 rounded" onclick="handleCOD()">
+              Place Order (COD)
+            </button>
+          </div>
 
           <script>
+            const radios = document.querySelectorAll('input[name="payment_option"]');
+            const methods = document.querySelectorAll('.payment-method');
+            const totalAmount = "{{ grand_total|floatformat:2|unlocalize }}";
+
+            radios.forEach(radio => {
+              radio.addEventListener('change', function () {
+                methods.forEach(m => m.classList.add('hidden'));
+                if (this.value === "paypal") {
+                  document.getElementById("paypal-container").classList.remove("hidden");
+                } else if (this.value === "upi") {
+                  document.getElementById("upi-container").classList.remove("hidden");
+                  updateUPILink(totalAmount);
+                } else if (this.value === "cod") {
+                  document.getElementById("cod-container").classList.remove("hidden");
+                }
+              });
+            });
+
+            // ======= UPI Setup =======
+            function updateUPILink(amount) {
+              let upiID = "shobipri57@okhdfcbank"; // replace with vendor's UPI ID
+              let name = "SMK - Beads and Crafts";
+              let txnId = "TXN" + Date.now();
+              let note = "Order Payment";
+
+              let upiUrl = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&tid=${txnId}&tn=${note}&am=${amount}&cu=INR`;
+
+              document.getElementById("upi-link").href = upiUrl;
+              const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+
+              // Detect mobile vs desktop
+              const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+              if (isMobile) {
+                document.getElementById("upi-mobile").classList.remove("hidden");
+                document.getElementById("upi-link").setAttribute("href", upiURL);
+              } else {
+                document.getElementById("upi-desktop").classList.remove("hidden");
+                document.getElementById("upi-qr").setAttribute("src", qrURL);
+              }
+            }
+
+            function handleUPI() {
+              fetch("{% url 'payments' %}", {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+                  "Content-type": "application/json"
+                },
+                body: JSON.stringify({
+                  orderID: "{{ order.order_number }}",
+                  transID: "UPI-" + Date.now(),
+                  payment_method: "UPI",
+                  status: "Pending"
+                })
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === "success") {
+                    window.location.href = "{% url 'order_complete' %}" +
+                      '?order_number=' + data.order_number + '&payment_id=' + data.trans_ID;
+                  }
+                });
+            }
+
+            // ======= COD Handling =======
+            function handleCOD() {
+              fetch("{% url 'payments' %}", {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+                  "Content-type": "application/json"
+                },
+                body: JSON.stringify({
+                  orderID: "{{ order.order_number }}",
+                  transID: "COD-" + Date.now(),
+                  payment_method: "COD",
+                  status: "Pending"
+                })
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === "success") {
+                    window.location.href = "{% url 'order_complete' %}" +
+                      '?order_number=' + data.order_number + '&payment_id=' + data.trans_ID;
+                  }
+                });
+            }
 
             function getCookie(name) {
               var cookieValue = null;
@@ -155,17 +283,17 @@
                       "Content-type": "application/json"
                     },
                     body: JSON.stringify({
-                      orderID : orderID,
+                      orderID: orderID,
                       transID: details.id,
-                      payment_method : "PayPal",
-                      status : details.status
+                      payment_method: "PayPal",
+                      status: details.status
                     })
                   })
-                  .then(response => response.json())
+                    .then(response => response.json())
                     .then(data => {
                       console.log("Order Details : ", data);
                       if (data.status === "success") {
-                        window.location.href = "{% url 'order_complete' %}" + '?order_number='+data.order_number+'&payment_id='+data.trans_ID;
+                        window.location.href = "{% url 'order_complete' %}" + '?order_number=' + data.order_number + '&payment_id=' + data.trans_ID;
                       }
                     });
                 });

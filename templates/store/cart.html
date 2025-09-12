@@ -67,7 +67,7 @@
                           {% if cart_item.variations.all %}
                           {% for variation in cart_item.variations.all %}
                           <span class="inline-block text-gray-700 py-1 rounded-md text-xs">
-                            {{ variation.variation_category | capfirst }} : {{ variation.variation_value | capfirst }}
+                            {{ variation.category.name | capfirst }} : {{ variation.value | capfirst }}
                           </span>
                           <br />
                           {% endfor %}
@@ -160,11 +160,6 @@
               <span>Total:</span>
               <span>${{ grand_total|floatformat:2 }}</span>
             </div>
-          </div>
-
-          <!-- Payment Icons -->
-          <div class="text-center mb-6">
-            <img src="{% static 'images/misc/payments.png' %}" alt="Payment Methods" class="h-6 mx-auto">
           </div>
 
           <!-- Action Buttons -->

@@ -8,7 +8,30 @@
   <div class="flex justify-center">
     <i class="fas fa-check-circle text-green-600 text-7xl mb-5"></i>
   </div>
-  <h2 class="text-center text-2xl font-bold">Payment Successful</h2>
+
+  <!-- Conditional Message -->
+  <h2 class="text-center text-2xl font-bold">
+    {% if payment.payment_method == "PayPal" and payment.status == "Completed" %}
+      Payment Successful
+    {% elif payment.payment_method == "UPI" and payment.status == "Pending" %}
+      Payment Pending Verification
+    {% elif payment.payment_method == "COD" %}
+      Order Placed (Cash on Delivery)
+    {% else %}
+      Order Status: {{ payment.status }}
+    {% endif %}
+  </h2>
+
+  <!-- Instruction / Note -->
+  <p class="text-center text-gray-600 mt-2">
+    {% if payment.payment_method == "UPI" and payment.status == "Pending" %}
+      We've received your order. Please ensure you've completed the payment via UPI. The shop owner will verify and confirm your payment.
+    {% elif payment.payment_method == "COD" %}
+      Your order is placed and will be collected via Cash on Delivery.
+    {% elif payment.payment_method == "PayPal" %}
+      Thank you! Your payment has been successfully processed via PayPal.
+    {% endif %}
+  </p>
 
   <!-- Shop More Button -->
   <div class="text-center mt-4">
@@ -42,6 +65,7 @@
       <li><span class="font-semibold">Order: </span>{{ order_number }}</li>
       <li><span class="font-semibold">Transaction: </span>{{ trans_ID }}</li>
       <li><span class="font-semibold">Order Date: </span>{{ order.created_at }}</li>
+      <li><span class="font-semibold">Payment Method: </span>{{ payment.payment_method }}</li>
       <li><span class="font-semibold">Status: </span> <span class="text-green-600 font-bold">{{ payment.status }}</span></li>
     </ul>
   </div>
@@ -63,9 +87,9 @@
           <td class="px-4 py-2">
             {{ item.product.product_name | capfirst }}
             <p>
-              {% if cart_item.variations.all %}
-                {% for item in cart_item.variations.all %}
-                  {{ item.variation_category | capfirst }} : {{ item.variation_value | capfirst }} <br/>
+              {% if item.variations.all %}
+                {% for v in item.variations.all %}
+                  {{ v.variation_category | capfirst }} : {{ v.variation_value | capfirst }} <br/>
                 {% endfor %}
               {% endif %}
             </p>

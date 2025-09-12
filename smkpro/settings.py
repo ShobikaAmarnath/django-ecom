@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'store',
     'carts',
     'wishlist',
-    'orders',
+    'orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [
