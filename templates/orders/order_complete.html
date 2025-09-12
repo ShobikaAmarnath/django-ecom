@@ -4,7 +4,6 @@
 
 <div class="max-w-5xl mx-auto mt-12">
 
-    {% include 'includes/alerts.html' %}
   <!-- Success Icon -->
   <div class="flex justify-center">
     <i class="fas fa-check-circle text-green-600 text-7xl mb-5"></i>
@@ -93,16 +92,5 @@
       </tfoot>
     </table>
   </div>
-
-<!-- Add message auto-dismiss script -->
-<script>
-  setTimeout(() => {
-    const container = document.getElementById("messages-container");
-    if (container) {
-      container.classList.add("opacity-0");
-      setTimeout(() => container.remove(), 300);
-    }
-  }, 5000);
-</script>
 
 {% endblock %}

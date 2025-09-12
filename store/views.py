@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib import messages
@@ -6,10 +6,14 @@ from django.contrib import messages
 from carts.models import CartItem
 from carts.views import _cart_id
 from category.models import Category
-from .models import Product
+from .models import Product, ProductGallery
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 # Create your views here.
+
+from wishlist.models import Wishlist, WishlistItem
+from wishlist.views import _wishlist_id
+
 
 def store(request, category_slug=None):
     categories = None
@@ -19,44 +23,62 @@ def store(request, category_slug=None):
         products = Product.objects.filter(category=categories, is_available=True).order_by('id')
         paginator = Paginator(products, 3)
         page = request.GET.get('page')
-        # try:
         paged_products = paginator.get_page(page)
-        # except PageNotAnInteger:
-        #     paged_products = paginator.page(1)
-        # except EmptyPage:
-        #     paged_products = paginator.page(paginator.num_pages)
         product_count = products.count()
     else:
-        products = Product.objects.all().filter(is_available=True).order_by('id')
+        products = Product.objects.filter(is_available=True).order_by('id')
         paginator = Paginator(products, 3)
         page = request.GET.get('page')
         try:
-              paged_products = paginator.get_page(page)
+            paged_products = paginator.get_page(page)
         except PageNotAnInteger:
             paged_products = paginator.page(1)
         except EmptyPage:
             paged_products = paginator.page(paginator.num_pages)
         product_count = products.count()
-    
+
+    # ✅ Wishlist integration
+    wishlist_ids = []
+    if request.user.is_authenticated:
+        wishlist_items = WishlistItem.objects.filter(user=request.user, is_active=True)
+    else:
+        wishlist_obj, _ = Wishlist.objects.get_or_create(wishlist_id=_wishlist_id(request))
+        wishlist_items = WishlistItem.objects.filter(wishlist=wishlist_obj, is_active=True)
+
+    wishlist_ids = list(wishlist_items.values_list('product_id', flat=True))
+
     context = {
         'products': paged_products,
         'product_count': product_count,
+        'wishlist_products': wishlist_ids,   
     }
     return render(request, 'store/store.html', context)
 
 def product_detail(request, category_slug, product_slug):
     try:
-        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug) # category__slug is the syntax to filter by related Foreign key model's field
+        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
         in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product).exists()
         
-    except Exception as e:
-        raise e
+        # Get variations grouped by category
+        variations_by_category = {}
+        for variation in single_product.variations.filter(is_active=True):
+            category = variation.category.name
+            if category not in variations_by_category:
+                variations_by_category[category] = []
+            variations_by_category[category].append(variation.value)
+
+    except Product.DoesNotExist:
+        raise Http404("Product not found")
     
+    product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
+
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
+        'variations_by_category': variations_by_category,
+        'product_gallery': product_gallery,
     }
-    return render(request, 'store/product_detail.html',context)
+    return render(request, 'store/product_detail.html', context)
 
 def search(request):
     products = None

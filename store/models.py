@@ -22,29 +22,36 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
     
-class VariationManager(models.Manager):
-    def colors(self):
-        return super(VariationManager, self).filter(variation_category='color', is_active=True)
-
-    def sizes(self):
-        return super(VariationManager, self).filter(variation_category='size', is_active=True)
-
-    def materials(self):
-        return super(VariationManager, self).filter(variation_category='material', is_active=True)
+class VariationCategory(models.Model):
+    name = models.CharField(max_length=50, unique=True)  # e.g. Color, Size, Storage
     
-variation_category_choices = (
-    ('color', 'color'),
-    ('size', 'size'),
-    ('material', 'material'),
-)
+    class Meta:
+        verbose_name = 'VariationCategory'
+        verbose_name_plural = 'variation_categories'
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+
 class Variation(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation_category = models.CharField(max_length=100, choices=variation_category_choices)
-    variation_value = models.CharField(max_length=100)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variations")
+    category = models.ForeignKey(VariationCategory, on_delete=models.CASCADE, related_name="variations")
+    value = models.CharField(max_length=100)  # e.g. Red, XL, 128GB
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    objects = VariationManager()
+    def __str__(self):
+        return f"{self.category.name}: {self.value}"
+
+class ProductGallery(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="gallery")
+    image = models.ImageField(upload_to='store/products', max_length=255)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'ProductGallery'
+        verbose_name_plural = 'product_gallery'
 
     def __str__(self):
-        return self.variation_value
+        return self.product.product_name

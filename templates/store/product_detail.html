@@ -2,117 +2,307 @@
 {% load static %}
 {% block content %}
 
-<section class="py-8 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="py-6 sm:py-8 md:py-12 bg-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    <!-- Product Details -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 p-6 sm:p-8 md:p-12">
 
-        <!-- Product Images -->
-        <div class="p-6">
-          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg">
-            <img src="{{ single_product.product_image.url }}" alt="{{ single_product.product_name }}"
-              class="w-full h-96 object-cover">
-          </div>
-        </div>
+                <div class="flex flex-col items-center">
+                    <div id="imageContainer" class="w-full max-w-lg aspect-w-1 aspect-h-1 overflow-hidden rounded-xl mb-4 sm:mb-6 md:mb-8 relative group">
+                        <img id="mainProductImage" src="{{ single_product.product_image.url }}" alt="{{ single_product.product_name }}"
+                            class="w-full h-full object-cover transition-transform duration-300 ease-in-out cursor-zoom-in">
+                    </div>
 
-        <!-- Product Info -->
-        <div class="p-6 border-l border-gray-200">
-          <form action="{% url 'add_cart' single_product.id %}" method="POST">
-            {% csrf_token %}
-            <div class="space-y-6">
-
-              <!-- Title and Price -->
-              <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{single_product.product_name}}</h1>
-                <div class="mt-4">
-                  <span class="text-3xl font-bold text-gray-900">${{ single_product.product_price }}</span>
+                    <div class="mt-4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4 w-full max-w-lg">
+                        <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg border-2 border-primary cursor-pointer thumbnail-item active-thumbnail transform transition-transform duration-200 hover:scale-105">
+                            <img src="{{ single_product.product_image.url }}" alt="Main product thumbnail"
+                                class="w-full h-full object-cover"
+                                data-image="{{ single_product.product_image.url }}">
+                        </div>
+                        {% for image in product_gallery %}
+                        <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg border-2 border-transparent hover:border-blue-400 cursor-pointer thumbnail-item transform transition-transform duration-200 hover:scale-105">
+                            <img src="{{ image.image.url }}" alt="Thumbnail {{ forloop.counter }}"
+                                class="w-full h-full object-cover"
+                                data-image="{{ image.image.url }}">
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-              </div>
 
-              <!-- Description -->
-              <div>
-                <p class="text-gray-600 leading-relaxed">{{ single_product.description }}</p>
-              </div>
+                <div class="flex flex-col justify-between">
+                    <form action="{% url 'add_cart' single_product.id %}" method="POST" class="h-full flex flex-col">
+                        {% csrf_token %}
+                        <div class="space-y-4 sm:space-y-6 flex-grow">
+                            <div>
+                                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">{{ single_product.product_name }}</h1>
+                                <div class="mt-3 sm:mt-5 flex items-baseline space-x-2 sm:space-x-3">
+                                    <span class="text-3xl sm:text-4xl font-bold text-gray-900">₹{{ single_product.product_price|floatformat:2 }}</span>
+                                    {% if single_product.old_price %}
+                                    <span class="text-xl sm:text-2xl text-gray-500 line-through">₹{{ single_product.old_price|floatformat:2 }}</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm sm:text-base text-gray-500 mt-1 sm:mt-2">Inclusive of all taxes</p>
+                            </div>
 
-              <hr class="border-gray-200">
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 sm:mb-3">Description</h2>
+                                <p class="text-gray-600 leading-relaxed text-justify">{{ single_product.description }}</p>
+                            </div>
 
-              <!-- Color Options -->
-              <div>
-                <h6 class="text-lg font-semibold text-gray-900 mb-3">Choose Color</h6>
-                <select id="color" name="radio_color"
-                  class="px-6 py-2 border border-gray-300 rounded-md text-sm focus:border-primary focus:ring-primary focus:outline-none">
-                  <option value="" disabled selected>Select Color</option>
-                  {% for i in single_product.variation_set.colors %}
-                  <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
-                  {% endfor %}
-                </select>
-              </div>
+                            <hr class="border-gray-200 my-6 sm:my-8">
 
-              <!-- Size Options -->
-              <div>
-                <h6 class="text-lg font-semibold text-gray-900 mb-3">Select Size</h6>
-                <select id="size" name="radio_size"
-                  class="px-6 py-2 border border-gray-300 rounded-md text-sm focus:border-primary focus:ring-primary focus:outline-none">
-                  <option value="" disabled selected>Select Size</option>
-                  {% for i in single_product.variation_set.sizes %}
-                  <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
-                  {% endfor %}
-                </select>
-              </div>
+                            {% for category, values in variations_by_category.items %}
+                            <div class="mb-4 sm:mb-5">
+                                <h6 class="text-lg font-semibold text-gray-900 mb-3 sm:mb-4">{{ category|capfirst }}</h6>
+                                <div class="relative inline-block w-full">
+                                    <div id="custom-dropdown-{{ category|lower }}"
+                                         class="w-full px-4 sm:px-5 py-2 sm:py-3 border border-gray-300 rounded-lg text-base text-gray-700 focus:border-blue-500 focus:ring-blue-500 focus:outline-none transition-colors duration-200 shadow-sm bg-white cursor-pointer flex items-center justify-between">
+                                        <span id="selected-value-{{ category|lower }}">Select {{ category|capfirst }}</span>
+                                        <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                                    </div>
+                                    <div id="dropdown-options-{{ category|lower }}"
+                                         class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg hidden animate-fade-in-down">
+                                        {% for value in values %}
+                                        <div class="px-4 sm:px-5 py-2 sm:py-3 text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-200"
+                                             data-value="{{ value|lower }}">
+                                            {{ value|capfirst }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <input type="hidden" name="variation_{{ category|lower }}" id="variation-input-{{ category|lower }}" required>
+                            </div>
+                            {% endfor %}
 
-              <hr class="border-gray-200">
+                            <hr class="border-gray-200 my-6 sm:my-8">
+                        </div>
 
-              <!-- Add to Cart -->
-              <div>
-                {% if single_product.stock <= 0 %} <div class="text-center">
-                  <h5 class="text-xl font-semibold text-red-600 mb-4">Out of Stock</h5>
-                  <button class="w-full bg-gray-400 text-white py-3 rounded-md cursor-not-allowed" disabled>
-                    Unavailable
-                  </button>
-              </div>
-              {% else %}
-              <button type="submit"
-                class="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
-                <span>Add to cart</span>
-                <i class="fas fa-shopping-cart"></i>
-              </button>
-              {% endif %}
+                        <div class="mt-auto pt-4 sm:pt-6">
+                            {% if single_product.stock <= 0 %}
+                            <div class="text-center bg-red-50 p-4 sm:p-6 rounded-lg">
+                                <h5 class="text-xl sm:text-2xl font-bold text-red-700 mb-2 sm:mb-3 animate-pulse">Currently Out of Stock!</h5>
+                                <p class="text-red-600 text-base sm:text-lg">We're working to restock this item soon. Please check back later.</p>
+                                <button class="w-full bg-gray-400 text-white py-3 sm:py-4 px-6 sm:px-8 rounded-lg text-base sm:text-lg cursor-not-allowed mt-3 sm:mt-4" disabled>
+                                    Unavailable
+                                </button>
+                            </div>
+                            {% else %}
+                            <button type="submit"
+                                class="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 sm:py-4 px-6 sm:px-8 rounded-lg text-lg sm:text-xl font-semibold shadow-lg hover:from-blue-700 hover:to-blue-900 transition-all duration-300 flex items-center justify-center space-x-2 sm:space-x-3 transform hover:-translate-y-0.5 hover:shadow-xl hover:bg-blue-600">
+                                <i class="fas fa-shopping-cart text-xl sm:text-2xl"></i>
+                                <span>Add to Cart</span>
+                            </button>
+                            <p class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-4 text-center">In stock: {{ single_product.stock }} units</p>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
             </div>
-          </form>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Customer Reviews -->
-  <div class="mt-12">
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h3 class="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
+        <div class="mt-8 sm:mt-16 bg-white rounded-xl shadow-lg p-6 sm:p-8 md:p-10 border border-gray-200">
+            <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 border-b pb-4">Customer Reviews <i class="far fa-comments text-blue-500 ml-2"></i></h3>
 
-      <div class="space-y-6">
-        <div class="flex space-x-4">
-          <img src="{% static 'images/avatars/avatar1.jpg' %}" alt="User Avatar"
-            class="w-12 h-12 rounded-full object-cover">
-          <div class="flex-1">
-            <div class="flex items-center justify-between">
-              <h6 class="font-semibold text-gray-900">Mike John</h6>
-              <span class="text-sm text-gray-500">24.04.2020</span>
+            <div class="space-y-6 sm:space-y-8">
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 items-start p-4 sm:p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <img src="{% static 'images/avatars/avatar1.jpg' %}" alt="User Avatar"
+                        class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-300 flex-shrink-0 shadow">
+                    <div class="flex-1">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
+                            <h6 class="font-bold text-lg sm:text-xl text-gray-900">Mike John</h6>
+                            <span class="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-0"><i class="far fa-calendar-alt mr-1"></i>24.04.2020</span>
+                        </div>
+                        <div class="flex items-center mb-2 sm:mb-3">
+                            {% for _ in "12345" %} <i class="fas fa-star text-yellow-400 text-base sm:text-lg mr-1"></i> {% endfor %}
+                            <span class="text-gray-600 text-xs sm:text-sm ml-2 font-medium">Verified Purchase</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed text-sm sm:text-base">
+                            "Absolutely love this product! The quality is superb and it exceeded my expectations. Highly recommend it to everyone looking for a durable and stylish item. Delivery was quick too!"
+                        </p>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 items-start p-4 sm:p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <img src="{% static 'images/avatars/avatar2.jpg' %}" alt="User Avatar"
+                        class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-green-300 flex-shrink-0 shadow">
+                    <div class="flex-1">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
+                            <h6 class="font-bold text-lg sm:text-xl text-gray-900">Jane Doe</h6>
+                            <span class="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-0"><i class="far fa-calendar-alt mr-1"></i>15.03.2021</span>
+                        </div>
+                        <div class="flex items-center mb-2 sm:mb-3">
+                            {% for _ in "1234" %} <i class="fas fa-star text-yellow-400 text-base sm:text-lg mr-1"></i> {% endfor %}
+                            <i class="far fa-star text-yellow-400 text-base sm:text-lg mr-1"></i>
+                            <span class="text-gray-600 text-xs sm:text-sm ml-2 font-medium">Happy Customer</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed text-sm sm:text-base">
+                            "Good product overall, but the color was slightly different than expected from the online pictures. Still, it's functional and good value for money. Would consider buying again."
+                        </p>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 items-start p-4 sm:p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <img src="{% static 'images/avatars/avatar3.jpg' %}" alt="User Avatar"
+                        class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-red-300 flex-shrink-0 shadow">
+                    <div class="flex-1">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
+                            <h6 class="font-bold text-lg sm:text-xl text-gray-900">Peter Jones</h6>
+                            <span class="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-0"><i class="far fa-calendar-alt mr-1"></i>01.07.2022</span>
+                        </div>
+                        <div class="flex items-center mb-2 sm:mb-3">
+                            {% for _ in "123" %} <i class="fas fa-star text-yellow-400 text-base sm:text-lg mr-1"></i> {% endfor %}
+                            {% for _ in "12" %} <i class="far fa-star text-yellow-400 text-base sm:text-lg mr-1"></i> {% endfor %}
+                            <span class="text-gray-600 text-xs sm:text-sm ml-2 font-medium">Average Experience</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed text-sm sm:text-base">
+                            "The item arrived a bit late, and there was a minor scratch. It's functional, but the delivery could have been better. The product itself is decent for the price point."
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="mt-2">
-              <p class="text-gray-600 leading-relaxed">
-                Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                quis nostrud exercitation ullamco laboris nisi ut aliquip
-              </p>
+            <div class="mt-8 sm:mt-10 pt-4 sm:pt-8 border-t border-gray-200">
+                <h4 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Write a Review <i class="fas fa-edit text-blue-500 ml-2"></i></h4>
+                <form action="#" method="POST" class="space-y-3 sm:space-y-4">
+                    <div class="flex flex-wrap items-center space-x-2">
+                        <label class="text-base sm:text-lg font-medium text-gray-700">Your Rating:</label>
+                        <div class="flex space-x-1">
+                            {% for i in "12345" %}
+                            <i class="far fa-star text-yellow-400 text-base sm:text-xl cursor-pointer hover:text-yellow-500 transition-colors duration-150" data-rating="{{ forloop.counter }}"></i>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="rating" id="userRating" value="0">
+                    </div>
+                    <div>
+                        <label for="reviewTitle" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Review Title</label>
+                        <input type="text" id="reviewTitle" name="review_title"
+                            class="block w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                            placeholder="Summarize your experience..." required>
+                    </div>
+                    <div>
+                        <label for="reviewComment" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Your Review</label>
+                        <textarea id="reviewComment" name="review_comment" rows="4"
+                            class="block w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base resize-y"
+                            placeholder="Tell us what you think about the product..." required></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full sm:w-auto bg-blue-600 text-white py-2 sm:py-3 px-6 sm:px-8 rounded-lg text-sm sm:text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md">
+                        Submit Review
+                    </button>
+                </form>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  </div>
 </section>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainProductImage = document.getElementById('mainProductImage');
+        const thumbnails = document.querySelectorAll('.thumbnail-item img');
+        const imageContainer = document.getElementById('imageContainer');
+
+        // --- Image Gallery Swap ---
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                document.querySelector('.thumbnail-item.active-thumbnail').classList.remove('active-thumbnail', 'border-primary');
+                
+                const newImageUrl = this.dataset.image;
+                mainProductImage.src = newImageUrl;
+                
+                this.parentNode.classList.add('active-thumbnail', 'border-primary');
+            });
+        });
+
+        // --- New Full-Image Zoom Functionality ---
+        imageContainer.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const xPercent = (x / rect.width) * 100;
+            const yPercent = (y / rect.height) * 100;
+            
+            this.style.setProperty('--mouse-x', `${xPercent}%`);
+            this.style.setProperty('--mouse-y', `${yPercent}%`);
+        });
+
+        // --- Custom Dropdown Functionality ---
+        const dropdowns = document.querySelectorAll('[id^="custom-dropdown-"]');
+        dropdowns.forEach(dropdown => {
+            const category = dropdown.id.split('-')[2];
+            const dropdownOptions = document.getElementById(`dropdown-options-${category}`);
+            const selectedValueSpan = document.getElementById(`selected-value-${category}`);
+            const chevronIcon = dropdown.querySelector('i');
+            const hiddenInput = document.getElementById(`variation-input-${category}`);
+
+            dropdown.addEventListener('click', () => {
+                dropdownOptions.classList.toggle('hidden');
+                dropdown.classList.toggle('border-blue-500');
+                chevronIcon.classList.toggle('rotate-180');
+            });
+
+            dropdownOptions.querySelectorAll('div').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const value = e.target.dataset.value;
+                    selectedValueSpan.textContent = e.target.textContent;
+                    hiddenInput.value = value;
+                    dropdownOptions.classList.add('hidden');
+                    dropdown.classList.remove('border-blue-500');
+                    chevronIcon.classList.remove('rotate-180');
+                    e.stopPropagation();
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    dropdownOptions.classList.add('hidden');
+                    dropdown.classList.remove('border-blue-500');
+                    chevronIcon.classList.remove('rotate-180');
+                }
+            });
+        });
+
+    });
+</script>
+
+<style>
+    :root {
+        --color-primary: #3b82f6;
+    }
+    .bg-primary { background-color: var(--color-primary); }
+    .text-primary { color: var(--color-primary); }
+    .border-primary { border-color: var(--color-primary); }
+    .focus\:border-primary:focus { border-color: var(--color-primary); }
+    .focus\:ring-primary:focus { --tw-ring-color: rgba(59, 130, 246, 0.5); }
+
+    /* New CSS for Full-Image Zoom */
+    #imageContainer:hover #mainProductImage {
+        transform: scale(1.5);
+        transform-origin: var(--mouse-x) var(--mouse-y);
+    }
+    
+    .animate-fade-in-down {
+        animation: fadeInDown 0.3s ease-out;
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fa-star.fas {
+        color: #fcd34d;
+    }
+    .fa-star.hover-star {
+        color: #fcd34d;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .5; }
+    }
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+</style>
 
 {% endblock %}

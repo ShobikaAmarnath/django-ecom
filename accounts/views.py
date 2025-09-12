@@ -272,6 +272,7 @@ def edit_profile(request):
         'user_profile': user_profile,
     }
     return render(request, 'accounts/edit_profile.html', context)
+
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 

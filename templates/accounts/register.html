@@ -7,9 +7,6 @@
 <section class="py-12 bg-gray-50 min-h-screen">
   <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-8">
 
-    {# Top Flash Messages (Success / General Errors) #}
-    {% include 'includes/alerts.html' %}
-
     <h2 class="text-2xl font-semibold text-center mb-6">Sign up</h2>
     
     <form action="{% url 'register' %}" method="POST" novalidate>
@@ -89,16 +86,5 @@
     <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Log In</a>
   </p>
 </section>
-
-<!-- Add message auto-dismiss script -->
-<script>
-  setTimeout(() => {
-    const container = document.getElementById("messages-container");
-    if (container) {
-      container.classList.add("opacity-0");
-      setTimeout(() => container.remove(), 300);
-    }
-  }, 5000);
-</script>
 
 {% endblock %}

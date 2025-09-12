@@ -7,8 +7,6 @@
 <section class="py-8 bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    {% include 'includes/alerts.html' %}
-
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
       <!-- Recheck Details -->
@@ -185,16 +183,5 @@
     </div>
   </div>
 </section>
-
-<!-- Add message auto-dismiss script -->
-<script>
-  setTimeout(() => {
-    const container = document.getElementById("messages-container");
-    if (container) {
-      container.classList.add("opacity-0");
-      setTimeout(() => container.remove(), 300);
-    }
-  }, 5000);
-</script>
 
 {% endblock %}

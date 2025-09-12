@@ -4,8 +4,6 @@
 
 {% block content %}
 
-{% include 'includes/alerts.html' %}
-
 <!-- Hero Banner -->
 <section class="py-8 bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,16 +75,5 @@
         </div>
   </div>
 </section>
-
-<!-- Add message auto-dismiss script -->
-<script>
-  setTimeout(() => {
-    const container = document.getElementById("messages-container");
-    if (container) {
-      container.classList.add("opacity-0");
-      setTimeout(() => container.remove(), 300);
-    }
-  }, 5000);
-</script>
 
 {% endblock content %}

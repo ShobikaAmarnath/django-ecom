@@ -1,130 +1,234 @@
 {% load static %}
-
 {% load custom_filters %}
 
-<header class="bg-white shadow-sm">
+<header class="bg-white shadow-lg sticky top-0 z-50 transition-colors duration-300">
 
-  <!-- Main Header -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
-      <!-- Logo -->
-      <div class="flex-shrink-0">
-        <a href="{% url 'home' %}" class="flex items-center">
-          <img class="h-16 w-auto" src="{% static 'images/logo.jpg' %}" alt="GreatKart">
-        </a>
-      </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 md:h-20">
 
-      <!-- Categories Dropdown -->
-      <div class="relative">
-        <div class="dropdown inline-block relative">
-          <button
-            class="bg-primary text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition-colors">
-            <i class="fa fa-bars mr-2"></i>
-            All Categories
-            <i class="fa fa-chevron-down ml-2"></i>
-          </button>
-          <div class="dropdown-menu absolute hidden bg-white shadow-lg rounded-md mt-1 py-2 w-48 z-50">
-            {% for category in links %}
-            <a class="block px-4 py-2 text-gray-800 hover:bg-gray-100" href="{{ category.get_url }}">
-              {{ category.category_name }}</a>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Store Link -->
-      <a href="{% url 'store' %}"
-        class="bg-white border border-primary text-primary px-4 py-2 rounded-md hover:bg-primary hover:text-white transition-colors">
-        Store
-      </a>
-
-      <!-- Search Bar -->
-      <div class="flex-1 max-w-lg mx-8">
-        <form action="{% url 'search' %}" class="relative" method="GET">
-          <div class="flex">
-            <input type="text"
-              class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="Search products..." name="keyword">
-            <button type="submit"
-              class="bg-primary text-white px-6 py-2 rounded-r-md hover:bg-blue-700 transition-colors">
-              <i class="fa fa-search"></i>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- User Actions -->
-      <div class="flex items-center space-x-4">
-        <!-- User Menu -->
-        {% if user.id is None %}
-        <div class="text-right">
-          <div class="text-xs text-gray-500">Welcome guest!</div>
-          <div class="text-sm">
-            <a href="{% url 'login' %}" class="text-gray-700 hover:text-primary">Sign in</a>
-            <span class="text-gray-400 mx-1">|</span>
-            <a href="{% url 'register' %}" class="text-gray-700 hover:text-primary">Register</a>
-          </div>
-        </div>
-        {% else %}
-        <div class="relative group">
-          <!-- Avatar -->
-          <div class="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
-            {% if user.userprofile.profile_picture %}
-            <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture"
-              class="w-full h-full object-cover">
-            {% else %}
-            <img src="{{ user|ui_avatar:100 }}" alt="Default Avatar" class="w-full h-full object-cover">
-            {% endif %}
-          </div>
-
-          <!-- Dropdown -->
-          <div class="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg hidden group-hover:block z-50">
-            <div class="px-4 py-3 border-b">
-              <p class="font-medium text-gray-800">{{ user.first_name }} {{ user.last_name }}</p>
-              <p class="text-sm text-gray-500">{{ user.email }}</p>
+            <div class="flex items-center space-x-2">
+                <button id="mobile-menu-button" class="md:hidden p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md transition-colors duration-200">
+                    <i class="fa fa-bars text-xl sm:text-2xl"></i>
+                </button>
+                <a href="{% url 'home' %}" class="flex items-center">
+                    <img class="h-8 sm:h-10 md:h-12 w-auto" src="{% static 'images/logo.jpg' %}" alt="GreatKart">
+                </a>
             </div>
-            <ul class="py-2">
-              <li><a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a></li>
-              <li><a href="{% url 'logout' %}" class="block px-4 py-2 hover:bg-gray-100 text-red-500">Logout</a></li>
-            </ul>
-          </div>
+
+            <div class="hidden md:flex items-center space-x-4 lg:space-x-6">
+                <div class="relative group">
+                    <button class="bg-primary text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition-colors">
+                        <i class="fa fa-th-list mr-2"></i>
+                        All Categories
+                        <i class="fa fa-chevron-down ml-2 transform transition-transform duration-300 group-hover:rotate-180"></i>
+                    </button>
+                    <div class="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-1 py-2 w-48 z-50 animate-fade-in-down">
+                        {% for category in links %}
+                        <a class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors" href="{{ category.get_url }}">
+                            {{ category.category_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="{% url 'store' %}" class="bg-white border border-primary text-primary px-4 py-2 rounded-md hover:bg-primary hover:text-white transition-colors">
+                    Store
+                </a>
+            </div>
+
+            <div class="flex-1 max-w-lg mx-8 hidden lg:block">
+                <form action="{% url 'search' %}" class="relative flex items-center" method="GET">
+                    <input type="text"
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                        placeholder="Search products..." name="keyword">
+                    <button type="submit"
+                        class="bg-primary text-white px-5 py-2 rounded-r-full hover:bg-blue-700 transition-colors">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-4">
+
+                <button id="theme-toggle" class="p-2 text-gray-700 hover:text-primary focus:outline-none transition-colors duration-200">
+                    <i id="theme-icon" class="fa fa-moon text-xl sm:text-2xl"></i>
+                </button>
+
+                {% if user.id is None %}
+                <a href="{% url 'login' %}" class="bg-primary text-white text-sm font-semibold px-4 py-2 rounded-full hidden sm:block hover:bg-blue-700 transition-colors">
+                    Sign in
+                </a>
+                <a href="{% url 'login' %}" class="md:hidden p-2 text-gray-700 hover:text-primary transition-colors">
+                    <i class="fa fa-user text-xl sm:text-2xl"></i>
+                </a>
+                {% else %}
+                <div id="user-menu-container" class="relative">
+                    <div id="user-menu-button" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden cursor-pointer border-2 border-transparent transition-colors duration-200">
+                        {% if user.userprofile.profile_picture %}
+                        <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-full h-full object-cover">
+                        {% else %}
+                        <img src="{{ user|ui_avatar:100 }}" alt="Default Avatar" class="w-full h-full object-cover">
+                        {% endif %}
+                    </div>
+                    <div id="user-menu-dropdown" class="absolute right-0 mt-2 w-56 bg-white shadow-xl rounded-lg hidden z-50 animate-fade-in-down transform origin-top-right scale-95 transition-all duration-200 ease-out">
+                        <div class="px-4 py-3 border-b border-gray-200">
+                            <p class="font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</p>
+                            <p class="text-sm text-gray-500">{{ user.email }}</p>
+                        </div>
+                        <ul class="py-2">
+                            <li><a href="{% url 'dashboard' %}" class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700 transition-colors"><i class="fa fa-tachometer-alt mr-2"></i>Dashboard</a></li>
+                            <li><a href="{% url 'logout' %}" class="flex items-center px-4 py-2 hover:bg-gray-100 text-red-500 transition-colors"><i class="fa fa-sign-out-alt mr-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+
+                <a href="{% url 'wishlist' %}" class="relative p-2 text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-heart text-xl sm:text-2xl"></i>
+                    {% if wishlist_count > 0 %}
+                    <span class="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center transform -translate-y-1/2 translate-x-1/2">
+                        {{ wishlist_count }}
+                    </span>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'cart' %}" class="relative p-2 text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-shopping-cart text-xl sm:text-2xl"></i>
+                    {% if cart_count > 0 %}
+                    <span class="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center transform -translate-y-1/2 translate-x-1/2">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </a>
+            </div>
         </div>
-
-        {% endif %}
-
-        <!-- Wishlist -->
-        <a href="{% url 'wishlist' %}" class="relative p-2 text-gray-600 hover:text-primary transition-colors">
-          <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center border">
-            <i class="fa fa-heart"></i> <!-- Heart icon -->
-          </div>
-          {% if wishlist_count > 0 %}
-          <span
-            class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {{ wishlist_count }}
-          </span>
-          {% endif %}
-        </a>
-
-
-        <!-- Cart -->
-        <a href="{% url 'cart' %}" class="relative p-2 text-gray-600 hover:text-primary transition-colors">
-          <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center border">
-            <i class="fa fa-shopping-cart"></i>
-          </div>
-          {% if cart_count > 0 %}
-          <span
-            class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {{ cart_count }}
-          </span>
-          {% endif %}
-        </a>
-      </div>
     </div>
-  </div>
+    
+    <div id="mobile-menu" class="bg-white md:hidden hidden animate-slide-down">
+        <div class="px-4 py-4 border-t border-gray-200">
+             <form action="{% url 'search' %}" class="relative flex mb-4" method="GET">
+                <input type="text"
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                    placeholder="Search products..." name="keyword">
+                <button type="submit"
+                    class="bg-primary text-white px-5 py-2 rounded-r-full hover:bg-blue-700 transition-colors">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+            <div class="space-y-2">
+                <a href="{% url 'store' %}" class="block px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-store-alt mr-2"></i>Store
+                </a>
+                <div class="relative">
+                    <button id="mobile-categories-button" class="w-full text-left px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="flex items-center"><i class="fa fa-th-list mr-2"></i>Categories</span>
+                        <i class="fa fa-chevron-down text-xs ml-2 transition-transform duration-300 transform"></i>
+                    </button>
+                    <div id="mobile-categories-menu" class="pl-6 mt-2 hidden animate-fade-in-down">
+                        {% for category in links %}
+                        <a class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" href="{{ category.get_url }}">
+                            {{ category.category_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 
-<style>
-  .dropdown:hover .dropdown-menu {
-    display: block;
-  }
-</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileCategoriesButton = document.getElementById('mobile-categories-button');
+        const mobileCategoriesMenu = document.getElementById('mobile-categories-menu');
+        const userMenuContainer = document.getElementById('user-menu-container');
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenuDropdown = document.getElementById('user-menu-dropdown');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // --- Mobile Menu Toggling ---
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileCategoriesButton.addEventListener('click', () => {
+            const chevron = mobileCategoriesButton.querySelector('i:last-child');
+            mobileCategoriesMenu.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        });
+
+        // Close mobile menu on resize to desktop view
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // --- Desktop User Menu with Hover Delay ---
+        let userMenuTimeout;
+
+        if (userMenuContainer) {
+            userMenuContainer.addEventListener('mouseenter', () => {
+                clearTimeout(userMenuTimeout);
+                userMenuDropdown.classList.remove('hidden');
+            });
+
+            userMenuContainer.addEventListener('mouseleave', () => {
+                userMenuTimeout = setTimeout(() => {
+                    userMenuDropdown.classList.add('hidden');
+                }, 300); // 300ms delay
+            });
+        }
+
+        // --- Mobile User Menu with Click Toggle ---
+        if (userMenuButton) {
+            userMenuButton.addEventListener('click', () => {
+                userMenuDropdown.classList.toggle('hidden');
+            });
+        }
+
+
+        // Close user dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (userMenuContainer) {
+                const isClickInside = userMenuContainer.contains(event.target);
+                const isDropdownVisible = !userMenuDropdown.classList.contains('hidden');
+
+                if (!isClickInside && isDropdownVisible) {
+                    userMenuDropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        // --- Dark Mode Functionality ---
+        const root = document.documentElement;
+        
+        // Initial theme setup
+        const isDarkMode = localStorage.getItem('theme') === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'));
+        
+        if (isDarkMode) {
+            root.classList.add('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            root.classList.remove('dark');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            root.classList.toggle('dark');
+            if (root.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+    });
+</script>

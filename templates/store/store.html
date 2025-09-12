@@ -142,9 +142,13 @@
                    <!-- <p>Wishlist Products: {{ wishlist_products }}</p> -->
                   <a href="{% url 'toggle_wishlist' product.id %}" title="Toggle Wishlist"
                     class="hover:text-red-600 transition">
+
                     {% if product.id in wishlist_products %}
+                    <!--add a log here --> 
+                    <!-- print("Product ID {{ product.id }} is in wishlist_products: {{ wishlist_products }}") -->
                     <i class="fas fa-heart text-red-600"></i>
-                    {% else %}
+                    {% else %}                    
+                    <!-- print("Product ID {{ product.id }} is in notttttt wishlist_products: {{ wishlist_products }}") -->
                     <i class="far fa-heart text-gray-500"></i>
                     {% endif %}
                   </a>
