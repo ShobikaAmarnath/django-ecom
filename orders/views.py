@@ -1,5 +1,6 @@
 import datetime
 import json
+import decimal
 from django.contrib import messages
 from django.shortcuts import redirect, render
 
@@ -205,10 +206,13 @@ def place_order(request):
     tax = 0
     total = 0
     quantity = 0
+    shipping_charge = 0
+    total_weight = 0
     
     for cart_item in cart_items:
             total += (cart_item.product.product_price * cart_item.quantity)
             quantity += cart_item.quantity
+            total_weight += (cart_item.product.weight * cart_item.quantity)
 
     tax = (2 * total) / 100  # Assuming a tax rate of 2%
     grand_total = total + tax
@@ -217,6 +221,18 @@ def place_order(request):
         form = OrderForm(request.POST)
 
         if form.is_valid():
+            state_from_form = form.cleaned_data['state']
+            total_weight_decimal = decimal.Decimal(total_weight)
+            if state_from_form.strip().lower() == 'tamil nadu':
+                shipping_charge_per_kg = decimal.Decimal('70.00')
+            else:
+                shipping_charge_per_kg = decimal.Decimal('100.00')
+
+            shipping_charge = total_weight_decimal * shipping_charge_per_kg
+            shipping_charge = round(shipping_charge, 2)
+
+            grand_total += shipping_charge
+            
             data = Order()
             data.user = current_user
             data.first_name = form.cleaned_data['first_name']
@@ -231,6 +247,7 @@ def place_order(request):
             data.order_note = form.cleaned_data['order_note']
             data.order_total = grand_total
             data.tax = tax
+            data.shipping_charge = shipping_charge
             data.ip = request.META.get('REMOTE_ADDR')
             data.status = 'Pending'
             data.is_ordered = False
@@ -243,13 +260,14 @@ def place_order(request):
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
-
+            
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
             context = {
                 'order': order,
                 'cart_items' : cart_items,
                 'total' : total,
                 'tax' : tax,
+                'delivery_charge': shipping_charge,
                 'grand_total' : grand_total
             }
 

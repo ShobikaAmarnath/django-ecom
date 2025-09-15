@@ -45,6 +45,7 @@ class Order(models.Model):
     order_note = models.CharField(max_length=100, blank=True)
     order_total = models.FloatField()
     tax = models.FloatField()
+    shipping_charge = models.FloatField(default=0.0)
     status = models.CharField(max_length=20, choices=STATUS, default='Pending')
     ip = models.CharField(blank=True, max_length=20)
     is_ordered = models.BooleanField(default=False)

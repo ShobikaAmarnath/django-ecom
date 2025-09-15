@@ -8,6 +8,12 @@ class Product(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=200, blank=True)
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
+    weight = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=0.50, # Default weight of 500g
+        help_text='Weight in kilograms (kg)'
+    )
     product_image = models.ImageField(upload_to='photos/products')
     stock = models.IntegerField()
     is_available = models.BooleanField(default=True)
