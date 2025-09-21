@@ -27,7 +27,11 @@ def register(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             phone_number = form.cleaned_data['phone_number']
-            username = email.split('@')[0]
+            username = email
+
+            if Account.objects.filter(email=email).exists():
+                messages.error(request, 'An account with this email address already exists.')
+                return redirect('register')
 
             user = Account.objects.create_user(
                 email=email,
@@ -49,6 +53,7 @@ def register(request):
             })
             to_email = email
             send_email = EmailMessage(mail_subject, message, to=[to_email])
+            send_email.content_subtype = "html"  # Main content is now text/html
             send_email.send()
 
             messages.success(request, "Thank you for registering. A confirmation email has been sent to your email address.")
@@ -121,14 +126,10 @@ def login(request):
             # Log the user in
             auth_login(request, user)
             messages.success(request, "Login successful.")
-            url = request.META.get('HTTP_REFERER')
-            try:
-                query = requests.utils.urlparse(url).query
-                params = dict(x.split('=') for x in query.split('&'))
-                if 'next' in params:
-                    nextPage = params['next']
-                    return redirect(nextPage)
-            except:
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
                 return redirect('dashboard')
         else:
             messages.error(request, "Invalid email or password.")
@@ -223,12 +224,6 @@ def resetPassword(request):
         
     else:
         return render(request, 'accounts/resetPassword.html')
-
-def my_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    context = {'orders': orders}
-    print("ORDERS are here : ", context)
-    return render(request, 'accounts/dashboard.html', context)
 
 def dashboard(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')

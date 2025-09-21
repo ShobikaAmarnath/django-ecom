@@ -1,13 +1,19 @@
 {% autoescape off %}
 
-Hi {{ user.first_name }},
+<p>Hi {{ user.first_name }},</p>
 
-Thank you for registering on our site. To activate your account, please click the link below:
-http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
-<!-- <a href="{{ activation_link }}">Activate your account</a> -->
+<p>Thank you for creating an account with us. Please click on the link below to confirm your email address and activate your account:</p>
 
-If you did not register, please ignore this email.
+<p style="margin: 20px 0;">
+  <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" 
+     target="_blank" 
+     style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+    Activate Your Account
+  </a>
+</p>
 
-Best regards!!!
+<p>If you did not register on our site, please ignore this email.</p>
+
+<p>Best regards,<br>The SMK-ECOM Team</p>
 
 {% endautoescape %}
