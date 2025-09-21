@@ -73,6 +73,24 @@ def add_cart(request, product_id):
 
     return redirect('cart')
 
+def increment_cart_item(request, cart_item_id):
+    """ Increments a cart item's quantity. """
+    cart_item = get_object_or_404(CartItem, id=cart_item_id)
+    
+    # Check ownership
+    is_owner = (request.user.is_authenticated and cart_item.user == request.user) or \
+               (not request.user.is_authenticated and cart_item.cart.cart_id == _cart_id(request))
+
+    if is_owner:
+        # Check against stock
+        if cart_item.quantity < cart_item.product.stock:
+            cart_item.quantity += 1
+            cart_item.save()
+        else:
+            messages.error(request, f"Only {cart_item.product.stock} units of {cart_item.product.product_name} available.")
+
+    return redirect('cart')
+
 
 def remove_cart(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id)

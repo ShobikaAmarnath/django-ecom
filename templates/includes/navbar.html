@@ -36,7 +36,7 @@
             </div>
 
             <div class="flex-1 max-w-lg mx-8 hidden lg:block">
-                <form action="{% url 'search' %}" class="relative flex items-center" method="GET">
+                <form action="{% url 'store' %}" class="relative flex items-center" method="GET">
                     <input type="text"
                         class="flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                         placeholder="Search products..." name="keyword">
@@ -105,7 +105,7 @@
     
     <div id="mobile-menu" class="bg-white md:hidden hidden animate-slide-down">
         <div class="px-4 py-4 border-t border-gray-200">
-             <form action="{% url 'search' %}" class="relative flex mb-4" method="GET">
+             <form action="{% url 'store' %}" class="relative flex mb-4" method="GET">
                 <input type="text"
                     class="flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                     placeholder="Search products..." name="keyword">

@@ -71,7 +71,7 @@
           </div>
           {% endwith %}
 
-          <form method="GET" action="">
+          <form method="GET" action="{% url 'store' %}">
 
             <div class="border-b border-gray-200 pt-4">
               <div class="py-4">
@@ -130,8 +130,8 @@
                 class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
                 Apply Filters
               </button>
-              {% if selected_filters %}
-              <a href="{{ request.path }}"
+              {% if query_params %}
+              <a href="{% if category %}{{ category.get_url }}{% else %}{% url 'store' %}{% endif %}"
                 class="block w-full text-center text-gray-700 bg-gray-200 py-2 rounded-md hover:bg-gray-300 transition-colors">
                 Clear Filters
               </a>
