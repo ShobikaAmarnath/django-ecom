@@ -22,96 +22,122 @@
 
       <!-- Sidebar Filters -->
       <aside class="lg:w-1/4">
-        <div class="bg-white rounded-lg shadow-md">
+        <div class="bg-white rounded-lg shadow-md p-4">
 
           <!-- Categories Filter -->
-          <div class="border-b border-gray-200">
-            <div class="p-4">
-              <h6 class="font-semibold text-gray-900 mb-4 flex items-center">
-                <i class="fa fa-chevron-down mr-2"></i>
-                Categories
+          {% with category_limit=3 %}
+          <div x-data="{ open: true, showMore: false }" class="border-b border-gray-200 py-4">
+            <div class="px-4">
+              <h6 @click="open = !open"
+                class="font-semibold text-gray-900 flex items-center justify-between cursor-pointer">
+                <span>Categories</span>
+                <i class="fa fa-chevron-down text-sm text-gray-500 transition-transform duration-300"
+                  :class="{ '-rotate-180': !open }">
+                </i>
               </h6>
-              <ul class="space-y-2">
-                <li><a href="{% url 'store' %}" class="text-gray-600 hover:text-primary transition-colors">All
-                    Products</a></li>
-                {% for category in links %}
-                <li><a href="{{ category.get_url }}"
-                    class="text-gray-600 hover:text-primary transition-colors">{{category.category_name}}</a></li>
+
+              <div x-show="open" x-collapse>
+                <ul class="mt-4 space-y-2">
+                  <li>
+                    <a href="{% url 'store' %}" class="block text-gray-600 hover:text-blue-600 transition-colors">
+                      All Products
+                    </a>
+                  </li>
+
+                  {% for category in links %}
+                  <li {% if forloop.counter > category_limit %} x-show="showMore" x-transition {% endif %}>
+                    <a href="{{ category.get_url }}" class="block text-gray-600 hover:text-blue-600 transition-colors">
+                      {{ category.category_name }}
+                    </a>
+                  </li>
+                  {% endfor %}
+
+                  {% if links|length > category_limit %}
+                  <li class="pt-1">
+                    <button @click="showMore = !showMore"
+                      class="text-blue-600 hover:text-blue-800 font-semibold text-sm focus:outline-none">
+                      <span x-show="!showMore" class="flex items-center">
+                        Show More <i class="fa fa-plus ml-1 text-xs"></i>
+                      </span>
+                      <span x-show="showMore" class="flex items-center">
+                        Show Less <i class="fa fa-minus ml-1 text-xs"></i>
+                      </span>
+                    </button>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
+          {% endwith %}
+
+          <form method="GET" action="">
+
+            <div class="border-b border-gray-200 pt-4">
+              <div class="py-4">
+                <h6 class="font-semibold text-gray-800 mb-3">Price Range</h6>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Min (₹)</label>
+                    <input type="number" name="min_price" placeholder="0" value="{{ selected_filters.min_price }}"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Max (₹)</label>
+                    <input type="number" name="max_price" placeholder="Any" value="{{ selected_filters.max_price }}"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div x-data="{ open: false }" class="border-b border-gray-200">
+
+              <div @click="open = !open" class="py-4 flex justify-between items-center cursor-pointer">
+                <h6 class="font-semibold text-gray-900 flex items-center">
+                  <i class="fa fa-filter mr-2 text-gray-600"></i>
+                  <span>More Filters</span>
+                </h6>
+                <i class="fa fa-chevron-down text-sm text-gray-500 transition-transform duration-300"
+                  :class="{ '-rotate-180': !open }"></i>
+              </div>
+
+              <div x-show="open" x-collapse>
+
+                {% for category, options in processed_filters.items %}
+                <div class="pb-4">
+                  <h6 class="font-semibold text-gray-800 mb-3">{{ category|capfirst }}</h6>
+                  <div class="flex flex-wrap gap-2">
+                    {% for option in options %}
+                    <label>
+                      <input type="checkbox" name="{{ category }}" value="{{ option.value }}" class="peer hidden" 
+                      {% if option.is_selected %}checked{% endif %}>
+                      <span class="px-3 py-1 border border-gray-300 rounded-full text-sm cursor-pointer transition-colors 
+                           peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 
+                           hover:border-blue-500">
+                        {{ option.value|capfirst }}
+                      </span>
+                    </label>
+                    {% endfor %}
+                  </div>
+                </div>
                 {% endfor %}
-              </ul>
+              </div>
             </div>
-          </div>
 
-          <!-- Sizes Filter -->
-          <div class="border-b border-gray-200">
-            <div class="p-4">
-              <h6 class="font-semibold text-gray-900 mb-4 flex items-center">
-                <i class="fa fa-chevron-down mr-2"></i>
-                Sizes
-              </h6>
-              <div class="flex flex-wrap gap-2">
-                <label class="inline-flex items-center">
-                  <input type="checkbox" class="sr-only">
-                  <span
-                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XS</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="checkbox" class="sr-only">
-                  <span
-                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">SM</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="checkbox" class="sr-only">
-                  <span
-                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">LG</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input type="checkbox" class="sr-only">
-                  <span
-                    class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-primary cursor-pointer">XXL</span>
-                </label>
-              </div>
+            <div class="pt-4 space-y-2">
+              <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+                Apply Filters
+              </button>
+              {% if selected_filters %}
+              <a href="{{ request.path }}"
+                class="block w-full text-center text-gray-700 bg-gray-200 py-2 rounded-md hover:bg-gray-300 transition-colors">
+                Clear Filters
+              </a>
+              {% endif %}
             </div>
-          </div>
-
-          <!-- Price Range Filter -->
-          <div class="p-4">
-            <h6 class="font-semibold text-gray-900 mb-4 flex items-center">
-              <i class="fa fa-chevron-down mr-2"></i>
-              Price Range
-            </h6>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Min</label>
-                <select
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
-                  <option value="0">$0</option>
-                  <option value="50">$50</option>
-                  <option value="100">$100</option>
-                  <option value="150">$150</option>
-                  <option value="200">$200</option>
-                  <option value="500">$500</option>
-                  <option value="1000">$1000</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Max</label>
-                <select
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
-                  <option value="50">$50</option>
-                  <option value="100">$100</option>
-                  <option value="150">$150</option>
-                  <option value="200">$200</option>
-                  <option value="500">$500</option>
-                  <option value="1000">$1000</option>
-                  <option value="2000">$2000+</option>
-                </select>
-              </div>
-            </div>
-            <button
-              class="w-full bg-primary text-white py-2 rounded-md hover:bg-blue-700 transition-colors">Apply</button>
-          </div>
-        </div>
+          </form>
       </aside>
 
       <!-- Main Content -->
@@ -139,15 +165,15 @@
                 </a>
                 <div class="flex items-center gap-4">
                   <!-- Wishlist Icon -->
-                   <!-- <p>Wishlist Products: {{ wishlist_products }}</p> -->
+                  <!-- <p>Wishlist Products: {{ wishlist_products }}</p> -->
                   <a href="{% url 'toggle_wishlist' product.id %}" title="Toggle Wishlist"
                     class="hover:text-red-600 transition">
 
                     {% if product.id in wishlist_products %}
-                    <!--add a log here --> 
+                    <!--add a log here -->
                     <!-- print("Product ID {{ product.id }} is in wishlist_products: {{ wishlist_products }}") -->
                     <i class="fas fa-heart text-red-600"></i>
-                    {% else %}                    
+                    {% else %}
                     <!-- print("Product ID {{ product.id }} is in notttttt wishlist_products: {{ wishlist_products }}") -->
                     <i class="far fa-heart text-gray-500"></i>
                     {% endif %}
@@ -181,11 +207,10 @@
           {% if products.has_other_pages %}
           <ul class="flex items-center space-x-1">
 
-            <!-- Previous Button -->
             {% if products.has_previous %}
             <li>
-              <a href="?page={{ products.previous_page_number }}"
-                class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-100">
+              <a href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ products.previous_page_number }}"
+                class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-100 transition-colors duration-200">
                 Previous
               </a>
             </li>
@@ -197,28 +222,27 @@
             </li>
             {% endif %}
 
-            <!-- Page Numbers -->
             {% for i in products.paginator.page_range %}
             {% if products.number == i %}
             <li>
-              <span class="px-3 py-2 text-white bg-blue-600 border border-blue-600 font-semibold">
+              <span class="px-3 py-2 text-white bg-blue-600 border border-blue-600 font-semibold z-10">
                 {{ i }}
               </span>
             </li>
             {% else %}
             <li>
-              <a href="?page={{ i }}" class="px-3 py-2 text-blue-600 bg-white border border-gray-300 hover:bg-gray-100">
+              <a href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ i }}"
+                class="px-3 py-2 text-blue-600 bg-white border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
                 {{ i }}
               </a>
             </li>
             {% endif %}
             {% endfor %}
 
-            <!-- Next Button -->
             {% if products.has_next %}
             <li>
-              <a href="?page={{ products.next_page_number }}"
-                class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-100">
+              <a href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ products.next_page_number }}"
+                class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-100 transition-colors duration-200">
                 Next
               </a>
             </li>

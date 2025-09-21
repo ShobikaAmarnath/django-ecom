@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 
+from accounts.models import UserProfile
 from carts.models import Cart, CartItem
 from store.models import Product, Variation
 
@@ -127,7 +128,6 @@ def remove_cart_item(request, item_id):
 
 def cart(request, total=0, quantity=0, cart_items=None):
     try:
-        tax = 0
         grand_total = 0
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
@@ -138,12 +138,10 @@ def cart(request, total=0, quantity=0, cart_items=None):
             total += (cart_item.product.product_price * cart_item.quantity)
             quantity += cart_item.quantity
 
-        tax = (2 * total) / 100  # Assuming a tax rate of 2%
-        grand_total = total + tax
+        grand_total = total
 
     except Cart.DoesNotExist:
-        tax = (2 * total)/100
-        grand_total = total + tax
+        grand_total = total
     except ObjectDoesNotExist:
         pass
 
@@ -151,7 +149,6 @@ def cart(request, total=0, quantity=0, cart_items=None):
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
-        'tax': tax,
         'grand_total': grand_total,
         'cart_count': cart_items.count() if cart_items else 0,
     }
@@ -161,7 +158,6 @@ def cart(request, total=0, quantity=0, cart_items=None):
 @login_required(login_url= 'login')
 def checkout(request, total=0, quantity=0, cart_items=None):
     try:
-        tax = 0
         grand_total = 0
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
@@ -172,21 +168,26 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             total += (cart_item.product.product_price * cart_item.quantity)
             quantity += cart_item.quantity
 
-        tax = (2 * total) / 100  # Assuming a tax rate of 2%
-        grand_total = total + tax
+        grand_total = total
 
     except Cart.DoesNotExist:
-        tax = (2 * total)/100
-        grand_total = total + tax
+        grand_total = total
     except ObjectDoesNotExist:
         pass
+
+    user_profile = None
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            user_profile = None
 
     context = {
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
-        'tax': tax,
         'grand_total': grand_total,
         'cart_count': cart_items.count() if cart_items else 0,
+        'user_profile': user_profile,
     }
     return render(request, 'store/checkout.html', context)

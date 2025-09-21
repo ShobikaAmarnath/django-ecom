@@ -14,7 +14,7 @@ class Payment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
-    amount_paid = models.CharField(max_length=100)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -43,9 +43,8 @@ class Order(models.Model):
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
     order_note = models.CharField(max_length=100, blank=True)
-    order_total = models.FloatField()
-    tax = models.FloatField()
-    shipping_charge = models.FloatField(default=0.0)
+    order_total = models.DecimalField(max_digits=10, decimal_places=2)
+    shipping_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS, default='Pending')
     ip = models.CharField(blank=True, max_length=20)
     is_ordered = models.BooleanField(default=False)
@@ -65,11 +64,11 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     variations = models.ManyToManyField(Variation, blank=True)
     quantity = models.IntegerField()
-    product_unit_price = models.FloatField()
-    product_line_price = models.FloatField()
+    product_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    product_line_price = models.DecimalField(max_digits=10, decimal_places=2)
     ordered = models. BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    def _str_(self):
+    def __str__(self):
         return self.product.product_name

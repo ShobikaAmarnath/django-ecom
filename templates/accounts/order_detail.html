@@ -9,7 +9,6 @@
     <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
     <p><strong>Status:</strong> {{ order.status }}</p>
     <p><strong>Total:</strong> ${{ order.order_total }}</p>
-    <p><strong>Tax:</strong> ${{ order.tax }}</p>
   </div>
 
   <!-- Ordered Items -->
@@ -40,7 +39,6 @@
   <!-- Summary -->
   <div class="text-right mt-4">
     <p class="text-gray-700"><strong>Subtotal:</strong> ${{ order.order_total|floatformat:2 }}</p>
-    <p class="text-gray-700"><strong>Tax:</strong> ${{ order.tax|floatformat:2 }}</p>
     <p class="text-lg font-bold"><strong>Grand Total:</strong> ${{ order.order_total|add:order.tax }}</p>
   </div>
 </div>

@@ -203,7 +203,6 @@ def place_order(request):
         return redirect('store')
     
     grand_total = 0
-    tax = 0
     total = 0
     quantity = 0
     shipping_charge = 0
@@ -214,8 +213,7 @@ def place_order(request):
             quantity += cart_item.quantity
             total_weight += (cart_item.product.weight * cart_item.quantity)
 
-    tax = (2 * total) / 100  # Assuming a tax rate of 2%
-    grand_total = total + tax
+    grand_total = total
     
     if request.method == "POST":
         form = OrderForm(request.POST)
@@ -224,7 +222,7 @@ def place_order(request):
             state_from_form = form.cleaned_data['state']
             total_weight_decimal = decimal.Decimal(total_weight)
             if state_from_form.strip().lower() == 'tamil nadu':
-                shipping_charge_per_kg = decimal.Decimal('70.00')
+                shipping_charge_per_kg = decimal.Decimal('60.00')
             else:
                 shipping_charge_per_kg = decimal.Decimal('100.00')
 
@@ -246,7 +244,6 @@ def place_order(request):
             data.address_line_2 = form.cleaned_data['address_line_2']
             data.order_note = form.cleaned_data['order_note']
             data.order_total = grand_total
-            data.tax = tax
             data.shipping_charge = shipping_charge
             data.ip = request.META.get('REMOTE_ADDR')
             data.status = 'Pending'
@@ -266,7 +263,6 @@ def place_order(request):
                 'order': order,
                 'cart_items' : cart_items,
                 'total' : total,
-                'tax' : tax,
                 'delivery_charge': shipping_charge,
                 'grand_total' : grand_total
             }
