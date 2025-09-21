@@ -84,7 +84,7 @@
                     <div class="flex items-center justify-center space-x-2">
 
                       <!-- Minus Button Form -->
-                      <form action="{% url 'remove_cart' cart_item.product.id %}" method="POST">
+                      <form action="{% url 'remove_cart' cart_item.id %}" method="POST">
                         {% csrf_token %}
                         {% for var in cart_item.variations.all %}
                         <input type="hidden" name="radio_{{ var.variation_category|lower }}"

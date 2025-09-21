@@ -15,12 +15,24 @@ def store(request, category_slug=None):
     """
     Handles the store page, product filtering, and pagination.
     """
-    # 1. Get initial set of products based on category
+
+    category = None
+    products = Product.objects.filter(is_available=True).select_related('category')
+
+    # 1. Get initial set of products based on category and search keyword
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            products = products.filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
+            
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=category, is_available=True)
     else:
         products = Product.objects.filter(is_available=True)
+
+    # Get the final count *after* initial filtering
+    product_count = products.count()
 
     # 2. Build a list of all possible filters from the variations
     available_filters = {}
@@ -68,11 +80,6 @@ def store(request, category_slug=None):
         except Wishlist.DoesNotExist:
             pass # No session wishlist exists yet
 
-    # 6. Prepare context for the template
-    # KEY FIX: Remove 'page' from the query parameters before encoding
-    if 'page' in query_params:
-        del query_params['page']
-
     processed_filters = {}
     for category_name, available_values in available_filters.items():
         selected_values = request.GET.getlist(category_name)
@@ -83,21 +90,30 @@ def store(request, category_slug=None):
                 'is_selected': value in selected_values
             })
         processed_filters[category_name] = options
+        
+    # 6. Prepare context for the template
+    # KEY FIX: Remove 'page' from the query parameters before encoding
+    if 'page' in query_params:
+        del query_params['page']
 
     context = {
         'products': paged_products,
-        'product_count': products.count(),
+        'product_count': product_count,
         'wishlist_products': wishlist_ids,
         'available_filters': available_filters,
-        'selected_filters': request.GET, # Useful for checking which filters are active
         'query_params': query_params.urlencode(), # PASS THE ENCODED FILTERS HERE
         'processed_filters': processed_filters,
+        'category': category if category_slug else None,
     }
     return render(request, 'store/store.html', context)
 
 def product_detail(request, category_slug, product_slug):
     try:
-        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
+        single_product = Product.objects.prefetch_related(
+            'variations__category', 
+            'gallery'
+        ).get(category__slug=category_slug, slug=product_slug, is_available=True)
+
         in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product).exists()
         
         # Get variations grouped by category
@@ -110,8 +126,9 @@ def product_detail(request, category_slug, product_slug):
 
     except Product.DoesNotExist:
         raise Http404("Product not found")
+        # return render(request, 'store/product_not_found.html')
     
-    product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
+    product_gallery = single_product.gallery.all()
 
     context = {
         'single_product': single_product,
@@ -120,19 +137,3 @@ def product_detail(request, category_slug, product_slug):
         'product_gallery': product_gallery,
     }
     return render(request, 'store/product_detail.html', context)
-
-def search(request):
-    products = None
-    if 'keyword' in request.GET:
-        keyword = request.GET['keyword']
-        if keyword: 
-            print(f"Searching for: {keyword}")
-            products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
-            print(f"Found {products.count()} products matching '{keyword}'")
-            product_count = products.count()
-    
-    context = {
-        'products': products,
-        'product_count': product_count if products else 0,
-    }
-    return render(request, 'store/store.html', context)

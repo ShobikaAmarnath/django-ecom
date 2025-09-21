@@ -198,7 +198,7 @@ def reset_password_validate(request, uidb64, token):
 
     if user is not None and default_token_generator.check_token(user, token):
         request.session['uid'] = uid
-        messages.success(request, "Your Password Reset link is validated successfull")
+        messages.success(request, "Your Password Reset link is validated successfully!")
         return redirect('resetPassword')
     else:
         messages.error(request, "Activation link is invalid or has expired.")
