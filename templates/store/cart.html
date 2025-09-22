@@ -118,8 +118,8 @@
 
                   <!-- Price -->
                   <td class="px-6 py-4 text-center">
-                    <div class="text-lg font-bold text-gray-900">${{ cart_item.sub_total }}</div>
-                    <div class="text-sm text-gray-500">${{ cart_item.product.product_price }} each</div>
+                    <div class="text-lg font-bold text-gray-900">₹{{ cart_item.sub_total }}</div>
+                    <div class="text-sm text-gray-500">₹{{ cart_item.product.product_price }} each</div>
                   </td>
 
                   <!-- Remove Button -->
@@ -149,7 +149,7 @@
           <div class="space-y-3 mb-6">
             <div class="flex justify-between">
               <span class="text-gray-600">Subtotal:</span>
-              <span class="font-medium">${{ total|floatformat:2 }}</span>
+              <span class="font-medium">₹{{ total|floatformat:2 }}</span>
             </div>
             <hr class="border-gray-200">
             <small class="text-muted">Shipping charges will be added based on your address.</small>

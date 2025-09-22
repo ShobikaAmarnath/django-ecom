@@ -134,3 +134,8 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True # Use TLS with port 587
 EMAIL_USE_SSL = False # TLS and SSL are mutually exclusive
+
+# Custom settings
+SHOP_OWNER_EMAIL = config("SHOP_OWNER_EMAIL")
+UPI_ID = config("UPI_ID")
+UPI_NAME = config("UPI_NAME")

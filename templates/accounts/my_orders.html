@@ -21,7 +21,7 @@
             <td class="p-4 font-medium text-gray-800">#{{ order.order_number }}</td>
             <td class="p-4">{{ order.created_at|date:"M d, Y" }}</td>
             <td class="p-4">{{ order.payment.payment_method }}</td>
-            <td class="p-4 font-semibold">${{ order.order_total }}</td>
+            <td class="p-4 font-semibold">₹{{ order.order_total }}</td>
             <td class="p-4">
               <span class="
                 px-3 py-1 rounded-full text-xs font-semibold
