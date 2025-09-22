@@ -1,45 +1,83 @@
-{% extends "accounts/dashboard.html" %}
+{% extends "accounts/dashboard_base.html" %}
 
 {% block dashboard_content %}
-<h2 class="text-lg font-semibold mb-4">Order #{{ order.order_number }}</h2>
-
-<div class="space-y-4">
-  <!-- Order Info -->
-  <div class="bg-gray-50 p-4 rounded shadow-sm">
-    <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
-    <p><strong>Status:</strong> {{ order.status }}</p>
-    <p><strong>Total:</strong> ₹{{ order.order_total }}</p>
+<div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+  
+  <div class="flex flex-col sm:flex-row justify-between items-start pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Order Details</h2>
+      <p class="text-gray-500 dark:text-gray-400">Order #{{ order.order_number }}</p>
+    </div>
+    <a href="{% url 'my_orders' %}" class="text-blue-600 dark:text-blue-400 hover:underline mt-2 sm:mt-0">&larr; Back to My Orders</a>
   </div>
 
-  <!-- Ordered Items -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+    <div>
+      <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">Shipping Address</h3>
+      <address class="not-italic text-gray-600 dark:text-gray-300">
+        {{ order.full_name }}<br>
+        {{ order.address_line_1 }}<br>
+        {% if order.address_line_2 %}{{ order.address_line_2 }}<br>{% endif %}
+        {{ order.city }}, {{ order.state }}<br>
+        {{ order.country }}
+      </address>
+    </div>
+    <div>
+      <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">Order Summary</h3>
+      <ul class="text-gray-600 dark:text-gray-300 space-y-1">
+        <li><strong>Order Date:</strong> {{ order.created_at|date:"d M, Y" }}</li>
+        <li><strong>Payment Method:</strong> {{ order.payment.payment_method }}</li>
+        <li><strong>Status:</strong> <span class="font-semibold text-green-600">{{ order.status }}</span></li>
+      </ul>
+    </div>
+  </div>
+
   <div>
-    <h3 class="font-semibold mb-2">Items</h3>
-    <table class="w-full border-collapse text-sm">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="p-3 text-left">Product</th>
-          <th class="p-3">Quantity</th>
-          <th class="p-3">Unit Price</th>
-          <th class="p-3">Line Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in ordered_products %}
-        <tr class="border-t hover:bg-gray-50">
-          <td class="p-3">{{ item.product.product_name }}</td>
-          <td class="p-3">{{ item.quantity }}</td>
-          <td class="p-3">₹{{ item.product_unit_price }}</td>
-          <td class="p-3 font-semibold">₹{{ item.product_line_price }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">Items in this Order</h3>
+    <div class="overflow-x-auto border rounded-lg dark:border-gray-700">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr class="text-left text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+            <th class="p-3 font-semibold">Product</th>
+            <th class="p-3 text-center font-semibold">Qty</th>
+            <th class="p-3 text-right font-semibold">Unit Price</th>
+            <th class="p-3 text-right font-semibold">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for item in ordered_products %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+            <td class="p-3">
+              <p class="font-medium text-gray-800 dark:text-gray-200">{{ item.product.product_name }}</p>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                {% for v in item.variations.all %}{{ v.category.name|capfirst }}: {{ v.value|capfirst }}<br/>{% endfor %}
+              </div>
+            </td>
+            <td class="p-3 text-center">{{ item.quantity }}</td>
+            <td class="p-3 text-right">₹{{ item.product_unit_price|floatformat:2 }}</td>
+            <td class="p-3 text-right font-medium">₹{{ item.product_line_price|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Summary -->
-  <div class="text-right mt-4">
-    <p class="text-gray-700"><strong>Subtotal:</strong> ₹{{ order.order_total|floatformat:2 }}</p>
-    <p class="text-lg font-bold"><strong>Grand Total:</strong> ₹{{ order.order_total|add:order.tax }}</p>
+  <div class="mt-6 flex justify-end">
+    <div class="w-full max-w-sm space-y-2">
+      <div class="flex justify-between text-gray-600 dark:text-gray-300">
+        <span>Subtotal:</span>
+        <span>₹{{ subtotal|floatformat:2 }}</span>
+      </div>
+      <div class="flex justify-between text-gray-600 dark:text-gray-300">
+        <span>Shipping:</span>
+        <span>₹{{ order.shipping_charge|floatformat:2 }}</span>
+      </div>
+      <div class="flex justify-between text-lg font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-700">
+        <span>Grand Total:</span>
+        <span>₹{{ order.order_total|floatformat:2 }}</span>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

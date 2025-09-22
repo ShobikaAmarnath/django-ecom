@@ -1,32 +1,53 @@
-{% extends 'base.html' %}
+{% extends 'accounts/dashboard_base.html' %}
 
-{% load custom_filters %}
-
-{% block content %}
-
-<section class="py-10 bg-gray-100">
-
-  <div class="container mx-auto py-10">
-    <div class="flex gap-6">
-
-      <!-- Sidebar -->
-      <aside class="w-1/4 bg-white shadow rounded-lg p-4">
-        <ul class="space-y-2">
-          <li><a href="{% url 'dashboard' %}" class="block px-3 py-2 hover:bg-gray-100 rounded">My Orders</a></li>
-          <li><a href="{% url 'edit_profile' %}" class="block px-3 py-2 hover:bg-gray-100 rounded">Edit Profile</a></li>
-          <li><a href="{% url 'change_password' %}" class="block px-3 py-2 hover:bg-gray-100 rounded">Change Password</a></li>
-        </ul>
-      </aside>
-
-      <!-- Content Area -->
-      <main class="w-3/4 bg-white shadow rounded-lg p-6">
-        {% block dashboard_content %}
-        {% include "accounts/my_orders.html" %}
-        {% endblock %}
-      </main>
-
+{% block dashboard_content %}
+<div class="space-y-6">
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Welcome, {{ user.first_name }}!</h3>
+    <p class="text-gray-600 dark:text-gray-300 mt-2">From your dashboard, you can view your recent orders, manage your shipping addresses, and edit your password and account details.</p>
+  </div>
+  
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex items-center space-x-4">
+      <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><i class="fas fa-box-open text-2xl text-blue-600 dark:text-blue-300"></i></div>
+      <div>
+        <p class="text-gray-500 dark:text-gray-400">Total Orders</p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ orders_count }}</p>
+      </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <p class="font-semibold text-gray-900 dark:text-white">Default Address</p>
+      {% if user_profile.address_line_1 %}
+      <address class="not-italic text-gray-600 dark:text-gray-300 mt-2">
+        {{ user_profile.address_line_1 }}<br>
+        {{ user_profile.city }}, {{ user_profile.state }}
+      </address>
+      {% else %}
+      <p class="text-gray-500 dark:text-gray-400 mt-2">No address set.</p>
+      {% endif %}
+      <a href="{% url 'edit_profile' %}" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Edit Address</a>
     </div>
   </div>
-</section>
 
-{% endblock %}>
+  {% if recent_order %}
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Most Recent Order</h3>
+    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="font-semibold text-gray-800 dark:text-gray-200">Order #{{ recent_order.order_number }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Date: {{ recent_order.created_at|date:"d M, Y" }}</p>
+        </div>
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">{{ recent_order.status }}</span>
+        </div>
+        <div>
+          <p class="font-bold text-gray-800 dark:text-gray-200">₹{{ recent_order.order_total|floatformat:2 }}</p>
+        </div>
+        <a href="{% url 'order_detail' recent_order.order_number %}" class="text-blue-600 hover:underline">View Details</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

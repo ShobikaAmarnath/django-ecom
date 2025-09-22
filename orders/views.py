@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.contrib import messages
 from django.db import transaction
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from carts.models import CartItem
 from .forms import OrderForm
@@ -141,3 +142,22 @@ def order_complete(request):
         return render(request, 'orders/order_complete.html', context)
     except (Payment.DoesNotExist, Order.DoesNotExist):
         return redirect('home')
+    
+@login_required(login_url='login')
+def order_detail(request, order_number):
+    try:
+        # Fetch the order and all related items in an efficient way
+        order = Order.objects.get(order_number=order_number, user=request.user)
+        ordered_products = OrderProduct.objects.filter(order=order).select_related('product').prefetch_related('variations__category')
+        
+        # Calculate the subtotal
+        subtotal = order.order_total - order.shipping_charge
+
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'subtotal': subtotal,
+        }
+        return render(request, 'accounts/order_detail.html', context)
+    except Order.DoesNotExist:
+        return redirect('dashboard')

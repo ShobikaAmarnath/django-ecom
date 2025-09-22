@@ -9,6 +9,7 @@ from .forms import RegistrationForm, EditProfileForm, UserProfileForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 import requests
+from django.core.paginator import Paginator
 
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -225,24 +226,29 @@ def resetPassword(request):
     else:
         return render(request, 'accounts/resetPassword.html')
 
+@login_required(login_url='login')
 def dashboard(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    orders_count = Order.objects.filter(user=request.user).count()
+    user_profile = UserProfile.objects.get(user=request.user)
+    recent_order = Order.objects.filter(user=request.user).order_by('-created_at').first()
+
     context = {
-        'orders': orders,
+        'orders_count': orders_count,
+        'user_profile': user_profile,
+        'recent_order': recent_order,
     }
     return render(request, 'accounts/dashboard.html', context)
 
-def order_detail(request, order_id):
-    print("ORDER ID : ", order_id)
-    order = Order.objects.get(order_number=order_id, user=request.user)
-    ordered_products = order.orderproduct_set.all()
-
-    context = {
-        'order': order,
-        'ordered_products': ordered_products,
-    }
-    print("ORDER DETAILS : ", ordered_products)
-    return render(request, 'accounts/order_detail.html', context)
+@login_required(login_url='login')
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    
+    paginator = Paginator(orders, 5) # Show 5 orders per page
+    page_number = request.GET.get('page')
+    paged_orders = paginator.get_page(page_number)
+    
+    context = {'orders': paged_orders}
+    return render(request, 'accounts/my_orders.html', context)
 
 @login_required
 def edit_profile(request):
