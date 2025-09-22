@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; }
+        .header { background-color: #f8f9fa; padding: 15px; font-size: 18px; font-weight: bold; }
+        .details { margin-top: 20px; }
+        .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; }
+        .cta-button { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            New Order Received (#{{ order.order_number }})
+        </div>
+        <div class="details">
+            <p>You have received a new order. Please prepare it for fulfillment.</p>
+            <h3>Shipping Details:</h3>
+            <address style="font-style: normal;">
+                {{ order.full_name }}<br>
+                {{ order.address_line_1 }}<br>
+                {% if order.address_line_2 %}{{ order.address_line_2 }}<br>{% endif %}
+                {{ order.city }}, {{ order.state }}<br>
+                {{ order.country }}<br>
+                Phone: {{ order.phone }}
+            </address>
+
+            <h3>Items Ordered:</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.orderproduct_set.all %}
+                    <tr>
+                        <td>
+                            {{ item.product.product_name }}
+                            {% for variation in item.variations.all %}
+                                <br><small>{{ variation.category.name|capfirst }}: {{ variation.value|capfirst }}</small>
+                            {% endfor %}
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="http://{{ request.get_host }}{% url 'admin:orders_order_change' order.id %}" class="cta-button">
+                View Order in Admin
+            </a>
+        </div>
+    </div>
+</body>
+</html>

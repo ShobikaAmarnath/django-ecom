@@ -18,12 +18,12 @@
           <div class="text-gray-700 space-y-1">
             <p>{{ order.first_name }} {{ order.last_name }}</p>
             <p>{{ order.address_line_1 }}</p>
-            <p>{{ order.city }}, {{ order.state }}</p>
-            <p>{{ order.country }}</p>
-            <p>Email: {{ order.email }}</p>
-            <p>Phone: {{ order.phone }}</p>
+            {% if order.address_line_2 %}<p>{{ order.address_line_2 }}</p>{% endif %}
+            <p>{{ order.city }}, {{ order.state }} - {{ order.country }}</p>
+            <p><b>Email:</b> {{ order.email }}</p>
+            <p><b>Phone:</b> {{ order.phone }}</p>
             {% if order.order_note %}
-            <p class="italic text-gray-500">Note: {{ order.order_note }}</p>
+            <p class="pt-2 italic text-gray-500"><b>Note:</b> {{ order.order_note }}</p>
             {% endif %}
           </div>
         </div>
@@ -77,8 +77,8 @@
                     </div>
                   </td>
                   <td class="px-4 py-3 text-center">{{ item.quantity }}</td>
-                  <td class="px-4 py-3 text-center">${{ item.product.product_price|floatformat:2 }}</td>
-                  <td class="px-4 py-3 text-center">${{ item.sub_total|floatformat:2 }}</td>
+                  <td class="px-4 py-3 text-center">₹{{ item.product.product_price|floatformat:2 }}</td>
+                  <td class="px-4 py-3 text-center">₹{{ item.sub_total|floatformat:2 }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -96,16 +96,16 @@
           <div class="space-y-3 mb-6">
             <div class="flex justify-between">
               <span class="text-gray-600">Subtotal:</span>
-              <span class="font-medium">${{ total|floatformat:2|unlocalize }}</span>
+              <span class="font-medium">₹{{ total|floatformat:2|unlocalize }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Delivery Charge:</span>
-              <span class="font-medium">${{ delivery_charge|floatformat:2|unlocalize }}</span>
+              <span class="font-medium">₹{{ delivery_charge|floatformat:2|unlocalize }}</span>
             </div>
             <hr class="border-gray-200">
             <div class="flex justify-between text-lg font-bold">
               <span>Total:</span>
-              <span>${{ grand_total|floatformat:2|unlocalize }}</span>
+              <span>₹{{ grand_total|floatformat:2|unlocalize }}</span>
             </div>
           </div>
 
@@ -114,40 +114,47 @@
             src="https://www.paypal.com/sdk/js?client-id=AV_AByJjFGx3H95afZW-W6e1abIWT6UYEwZS3DszLjIvC7poT9Hv-mfTq6mZw_vupp7UlEmofvGVUb56&currency=USD">
             </script>
 
-          <div id="paypal-container" class="payment-method">
-            <div id="paypal-button-container"></div>
-          </div>
-
-          <!-- UPI Payment Section -->
-          <div id="upi-container" class="mt-4 payment-method hidden text-center">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Pay with UPI</h3>
-
-            <!-- Mobile: UPI Button -->
-            <div id="upi-mobile" class="hidden">
-              <a id="upi-link" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-                href="#">
-                Pay with UPI App
-              </a>
+          <div class="mt-6" x-data="{ submiting: false }">
+            <div id="paypal-container" class="payment-method">
+              <div id="paypal-button-container"></div>
             </div>
 
-            <!-- Desktop: QR Code -->
-            <div id="upi-desktop" class="hidden text-center">
-              <p class="text-gray-600 mb-2">Scan this QR code with your UPI app:</p>
-              <img id="upi-qr" class="mx-auto border p-2 rounded-lg shadow" alt="UPI QR Code" />
+            <!-- UPI Payment Section -->
+            <div id="upi-container" class="mt-4 payment-method hidden text-center">
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Pay with UPI</h3>
+
+              <!-- Mobile: UPI Button -->
+              <div id="upi-mobile" class="hidden">
+                <a id="upi-link" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                  href="#">
+                  Pay with UPI App
+                </a>
+              </div>
+
+              <!-- Desktop: QR Code -->
+              <div id="upi-desktop" class="hidden text-center">
+                <p class="text-gray-600 mb-2">Scan this QR code with your UPI app:</p>
+                <img id="upi-qr" class="mx-auto border p-2 rounded-lg shadow" alt="UPI QR Code" />
+              </div>
+
+              <button @click="submiting = true; handleUPI();" :disabled="submiting" class="w-full mt-4 bg-blue-600 text-white px-4 py-2 rounded disabled:bg-blue-300">
+                                <span x-show="!submiting">Confirm UPI Payment</span>
+                                <span x-show="submiting">Processing...</span>
+                            </button>
             </div>
 
-            <button onclick="handleUPI()" class="bg-blue-600 text-white px-4 py-2 rounded mt-12">
-              Once Paid, Click Here to Confirm
-            </button>
-          </div>
-
-          <div id="cod-container" class="payment-method hidden text-center">
-            <button class="bg-green-600 text-white px-4 py-2 rounded" onclick="handleCOD()">
-              Place Order (COD)
-            </button>
+            <div id="cod-container" class="payment-method hidden text-center">
+              <button @click="submiting = true; handleCOD();" :disabled="submiting" class="w-full bg-green-600 text-white px-4 py-2 rounded disabled:bg-green-300">
+                                <span x-show="!submiting">Place Order (COD)</span>
+                                <span x-show="submiting">Processing...</span>
+                            </button>
+            </div>
           </div>
 
           <script>
+            const UPI_ID = "{{ UPI_ID }}";
+            const UPI_NAME = "{{ UPI_NAME }}";
+
             const radios = document.querySelectorAll('input[name="payment_option"]');
             const methods = document.querySelectorAll('.payment-method');
             const totalAmount = "{{ grand_total|floatformat:2|unlocalize }}";
@@ -168,15 +175,15 @@
 
             // ======= UPI Setup =======
             function updateUPILink(amount) {
-              let upiID = "shobipri57@okhdfcbank"; // replace with vendor's UPI ID
-              let name = "SMK - Beads and Crafts";
+              let upiID = UPI_NAME;
+              let name = UPI_NAME;
               let txnId = "TXN" + Date.now();
-              let note = "Order Payment";
+              let note = "Order Payment for {{ order.order_number }}";
 
-              let upiUrl = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&tid=${txnId}&tn=${note}&am=${amount}&cu=INR`;
+              let upiUrl = `upi://pay?pa=₹{upiID}&pn=₹{encodeURIComponent(name)}&tid=₹{txnId}&tn=₹{note}&am=₹{amount}&cu=INR`;
 
               document.getElementById("upi-link").href = upiUrl;
-              const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+              const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=₹{encodeURIComponent(upiUrl)}`;
 
               // Detect mobile vs desktop
               const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);

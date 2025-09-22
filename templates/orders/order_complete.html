@@ -1,41 +1,30 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block content %}
+<div class="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto text-center">
+    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+      <i class="fas fa-check text-green-600 text-4xl"></i>
+    </div>
 
-<div class="max-w-5xl mx-auto mt-12">
+    <h2 class="mt-6 text-2xl sm:text-3xl font-bold text-gray-900">
+      {% if payment.payment_method == "PayPal" and payment.status == "Completed" %}
+        Payment Successful!
+      {% elif payment.payment_method == "UPI" and payment.status == "Pending" %}
+        Order Received, Pending Verification
+      {% elif payment.payment_method == "COD" %}
+        Your Order has been Placed!
+      {% else %}
+        Order Status: {{ payment.status }}
+      {% endif %}
+    </h2>
+    
+    <p class="mt-4 text-gray-600">
+        An order confirmation email has been sent to <strong>{{ order.email }}</strong>. Your order number is <strong>{{ order.order_number }}</strong>.
+    </p>
 
-  <!-- Success Icon -->
-  <div class="flex justify-center">
-    <i class="fas fa-check-circle text-green-600 text-7xl mb-5"></i>
-  </div>
-
-  <!-- Conditional Message -->
-  <h2 class="text-center text-2xl font-bold">
-    {% if payment.payment_method == "PayPal" and payment.status == "Completed" %}
-      Payment Successful
-    {% elif payment.payment_method == "UPI" and payment.status == "Pending" %}
-      Payment Pending Verification
-    {% elif payment.payment_method == "COD" %}
-      Order Placed (Cash on Delivery)
-    {% else %}
-      Order Status: {{ payment.status }}
-    {% endif %}
-  </h2>
-
-  <!-- Instruction / Note -->
-  <p class="text-center text-gray-600 mt-2">
-    {% if payment.payment_method == "UPI" and payment.status == "Pending" %}
-      We've received your order. Please ensure you've completed the payment via UPI. The shop owner will verify and confirm your payment.
-    {% elif payment.payment_method == "COD" %}
-      Your order is placed and will be collected via Cash on Delivery.
-    {% elif payment.payment_method == "PayPal" %}
-      Thank you! Your payment has been successfully processed via PayPal.
-    {% endif %}
-  </p>
-
-  <div class="max-w-md mx-auto mt-6 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+    <div class="max-w-xl mx-auto mt-6 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 items-center" role="alert">
     <div class="flex">
       <div class="py-1"><i class="fas fa-truck mr-3"></i></div>
       <div>
@@ -46,88 +35,95 @@
     </div>
   </div>
 
-  <!-- Shop More Button -->
-  <div class="text-center mt-4">
-    <a href="{% url 'store' %}" 
-       class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition">
-      Shop more
-    </a>
+    <div class="mt-8 flex justify-center space-x-4">
+      <a href="{% url 'store' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold transition">
+        Continue Shopping
+      </a>
+      <a href="{% url 'dashboard' %}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-md font-semibold transition">
+        View My Orders
+      </a>
+    </div>
+  </div>
+
+  <div id="invoice" class="max-w-4xl mx-auto bg-white p-8 sm:p-10 my-12 rounded-lg shadow-lg">
+    <div class="flex flex-col sm:flex-row justify-between items-start mb-8 pb-8 border-b">
+      <div>
+        <img src="{% static 'images/logo.jpg' %}" alt="Invoice logo" class="h-16 w-auto">
+        <h3 class="mt-4 text-lg font-semibold text-gray-800">SMK-ECOM</h3>
+      </div>
+      <div class="text-left sm:text-right mt-4 sm:mt-0">
+        <h2 class="text-2xl font-bold text-gray-900">INVOICE</h2>
+        <p class="text-gray-500">#{{ order.order_number }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+      <div>
+        <p class="font-semibold text-gray-500 mb-1">Billed To:</p>
+        <p class="font-bold text-gray-800">{{ order.full_name }}</p>
+        <p class="text-gray-600">{{ order.address_line_1 }}</p>
+        {% if order.address_line_2 %}<p class="text-gray-600">{{ order.address_line_2 }}</p>{% endif %}
+        <p class="text-gray-600">{{ order.city }}, {{ order.state }}</p>
+      </div>
+      <div class="text-left sm:text-right">
+        <p class="font-semibold text-gray-500 mb-1">Payment Details:</p>
+        <p class="text-gray-600"><strong>Method:</strong> {{ payment.payment_method }}</p>
+        <p class="text-gray-600"><strong>Transaction ID:</strong> {{ payment.payment_id }}</p>
+        <p class="text-gray-600"><strong>Date:</strong> {{ order.created_at|date:"d M, Y" }}</p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600">Product</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-600">Qty</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-600">Unit Price</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-600">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in ordered_products %}
+          <tr class="border-b">
+            <td class="px-4 py-3">
+              <p class="font-medium text-gray-800">{{ item.product.product_name|capfirst }}</p>
+              <p class="text-xs text-gray-500">
+                {% for v in item.variations.all %}{{ v.category.name|capfirst }}: {{ v.value|capfirst }}<br/>{% endfor %}
+              </p>
+            </td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ item.quantity }}</td>
+            <td class="px-4 py-3 text-right text-gray-600">₹{{ item.product_unit_price|floatformat:2 }}</td>
+            <td class="px-4 py-3 text-right text-gray-800 font-medium">₹{{ item.product_line_price|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2"></td>
+            <td class="px-4 py-3 text-right text-gray-600 font-medium">Subtotal:</td>
+            <td class="px-4 py-3 text-right text-gray-800">₹{{ subtotal|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td class="px-4 py-3 text-right text-gray-600 font-medium">Shipping:</td>
+            <td class="px-4 py-3 text-right text-gray-800">₹{{ order.shipping_charge|floatformat:2 }}</td>
+          </tr>
+          <tr class="bg-gray-100">
+            <td colspan="2"></td>
+            <td class="px-4 py-4 text-right text-gray-900 font-bold text-base">Grand Total:</td>
+            <td class="px-4 py-4 text-right text-gray-900 font-bold text-base">₹{{ order.order_total|floatformat:2 }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="text-center mt-8">
+        <button onclick="window.print()" class="text-gray-600 hover:text-blue-600 transition">
+            <i class="fas fa-print mr-2"></i>Print Invoice
+        </button>
+    </div>
+
   </div>
 </div>
-
-<!-- Invoice Section -->
-<div class="max-w-3xl mx-auto bg-gray-100 p-10 my-12 rounded-md shadow-md">
-  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-    <!-- Logo -->
-    <div>
-      <img src="{% static 'images/logo.jpg' %}" alt="Invoice logo" class="h-20 w-auto">
-    </div>
-    <!-- Invoiced To -->
-    <div class="text-right">
-      <p class="font-semibold">Invoiced To</p>
-      <p>{{ order.full_name }}</p>
-      <p>{{ order.address_line_1 }}</p>
-      <p>{{ order.city }}, {{ order.state }}</p>
-      <p>{{ order.country }}</p>
-    </div>
-  </div>
-
-  <!-- Order Details -->
-  <div class="bg-white p-4 rounded-md shadow mb-6">
-    <ul class="space-y-1">
-      <li><span class="font-semibold">Order: </span>{{ order_number }}</li>
-      <li><span class="font-semibold">Transaction: </span>{{ trans_ID }}</li>
-      <li><span class="font-semibold">Order Date: </span>{{ order.created_at }}</li>
-      <li><span class="font-semibold">Payment Method: </span>{{ payment.payment_method }}</li>
-      <li><span class="font-semibold">Status: </span> <span class="text-green-600 font-bold">{{ payment.status }}</span></li>
-    </ul>
-  </div>
-
-  <!-- Items Table -->
-  <div class="overflow-x-auto">
-    <table class="min-w-full border border-gray-300 text-sm">
-      <thead class="bg-gray-200">
-        <tr>
-          <th class="px-4 py-2 text-left">Product</th>
-          <th class="px-4 py-2 text-center">Product Price</th>
-          <th class="px-4 py-2 text-center">Quantity</th>
-          <th class="px-4 py-2 text-center">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in ordered_products %}
-        <tr class="border-t border-gray-300">
-          <td class="px-4 py-2">
-            {{ item.product.product_name | capfirst }}
-            <p>
-              {% if item.variations.all %}
-                {% for v in item.variations.all %}
-                  {{ v.category.name | capfirst }} : {{ v.value | capfirst }} <br/>
-                {% endfor %}
-              {% endif %}
-            </p>
-          </td>
-          <td class="px-4 py-2 text-center">₹{{ item.product.product_price }}</td>
-          <td class="px-4 py-2 text-center">{{ item.quantity }}</td>
-          <td class="px-4 py-2 text-center">₹{{ item.product_line_price }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot class="bg-gray-50">
-        <tr class="border-t border-gray-300">
-          <th colspan="3" class="px-4 py-2 text-right">Sub Total:</th>
-          <th class="px-4 py-2 text-center">₹{{ subtotal }}</th>
-        </tr>
-        <tr class="border-t border-gray-300">
-          <th colspan="3" class="px-4 py-2 text-right">Delivery Charge:</th>
-          <th class="px-4 py-2 text-center">₹{{ order.shipping_charge }}</th>
-        </tr>
-        <tr class="border-t border-gray-300">
-          <th colspan="3" class="px-4 py-2 text-right">Grand Total:</th>
-          <th class="px-4 py-2 text-center">₹{{ order.order_total }}</th>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-
 {% endblock %}

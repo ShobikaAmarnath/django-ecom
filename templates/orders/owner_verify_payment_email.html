@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; }
+        .alert { background-color: #fff3cd; border-left: 5px solid #ffeeba; padding: 15px; font-size: 18px; font-weight: bold; }
+        .details { margin-top: 20px; }
+        .cta-button { display: inline-block; background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert">
+            ACTION REQUIRED: Please Verify UPI Payment
+        </div>
+        <div class="details">
+            <p>A customer has placed an order and marked it as paid via UPI. Please verify that the payment has been received in your account.</p>
+            <ul>
+                <li><strong>Order Number:</strong> {{ order.order_number }}</li>
+                <li><strong>Customer:</strong> {{ order.full_name }}</li>
+                <li><strong>Amount:</strong> ₹{{ order.order_total|floatformat:2 }}</li>
+                <li><strong>Payment ID (Reference):</strong> {{ payment.payment_id }}</li>
+            </ul>
+            <p>Once you have confirmed the payment, please update the order status in the admin panel.</p>
+            <a href="http://{{ request.get_host }}{% url 'admin:orders_order_change' order.id %}" class="cta-button">
+                View Order in Admin
+            </a>
+        </div>
+    </div>
+</body>
+</html>
