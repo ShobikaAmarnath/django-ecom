@@ -1,62 +1,33 @@
 {% load static %}
 <!DOCTYPE HTML>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="pragma" content="no-cache" />
-<meta http-equiv="cache-control" content="max-age=604800" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en" class=""> <head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="max-age=604800" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>SMK</title>
+    <title>SMK E-commerce</title>
 
-<link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
 
-<!-- Tailwind CSS via CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- Font Awesome CDN -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<link rel="stylesheet" href="{% static 'css/styles.css' %}">
-
-<!-- Custom Tailwind Config -->
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#3167eb',
-                    secondary: '#6c757d',
-                    success: '#00b517',
-                    danger: '#fa3434',
-                    warning: '#ff9017',
-                    info: '#17a2b8',
-                    light: '#f8f9fa',
-                    dark: '#212529'
-                }
-            }
-        }
-    }
-</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 </head>
-<body>
+<body class="bg-bg-main text-text-main">
+    
     {% include 'includes/navbar.html' %}
-
+    
     {% include 'includes/alerts.html' %}
-    <script>
-      setTimeout(() => {
-        const container = document.getElementById("messages-container");
-        if (container) {
-          container.classList.add("opacity-0");
-          setTimeout(() => container.remove(), 300);
-        }
-      }, 5000);
-    </script>
-
-    {% block content %}{% endblock %}
-
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
     {% include 'includes/footer.html' %}
+    
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</body>
-
+    
+    </body>
 </html>

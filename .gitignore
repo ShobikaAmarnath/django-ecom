@@ -174,3 +174,8 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/django
 
 db_backup.sql
+
+node_modules/
+.DS_Store
+.vscode/history/
+*.code-workspace
