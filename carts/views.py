@@ -8,6 +8,7 @@ from carts.models import Cart, CartItem
 from store.models import Product, Variation
 
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 
@@ -106,9 +107,6 @@ def remove_cart(request, cart_item_id):
         else:
             cart_item.delete()
     return redirect('cart')
-
-
-from django.views.decorators.http import require_POST
 
 def remove_cart_item(request, cart_item_id):
     """ Deletes a cart item entirely. """

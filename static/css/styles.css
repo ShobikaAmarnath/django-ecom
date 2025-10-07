@@ -1,7 +1,199 @@
-/* static/css/styles.css */
-
 /* 1. Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 2. Core CSS variables (semantic tokens) for light mode */
+:root{
+  --c-primary: #0ea5a4;
+  --c-primary-600: #0b8b86;
+  --c-accent: #6366f1;
+  --c-slate-50: #f8fafc;
+  --c-slate-100: #f1f5f9;
+  --c-slate-300: #cbd5e1;
+  --c-slate-500: #94a3b8;
+  --c-slate-700: #475569;
+  --c-slate-900: #0f1724;
+  --c-surface: #ffffff;
+  --c-surface-muted: #f8fafc;
+  --c-text-main: #0f1724;
+  --c-text-muted: #475569;
+  --c-success: #10b981;
+  --c-danger: #ef4444;
+  --c-warning: #f59e0b;
+
+  /* gradients (expose for inline styles if needed) */
+  --g-primary: linear-gradient(90deg, var(--c-primary), var(--c-accent));
+}
+
+/* 3. Dark mode variables (applies when <html class="dark">) */
+:root.dark,
+.dark {
+  --c-primary: #0b8b86;
+  --c-primary-600: #0a6d69;
+  --c-accent: #4f46e5;
+  --c-slate-50: #0b1220; /* surface dark */
+  --c-slate-100: #0f1724;
+  --c-slate-300: #1f2937;
+  --c-slate-500: #475569;
+  --c-slate-700: #94a3b8;
+  --c-slate-900: #e6eef7;
+  --c-surface: #071022;
+  --c-surface-muted: #08131f;
+  --c-text-main: #e6eef7;
+  --c-text-muted: #b7c3d6;
+  --c-success: #10b981;
+  --c-danger: #f87171;
+  --c-warning: #fbbf24;
+
+  --g-primary: linear-gradient(90deg, var(--c-primary), var(--c-accent));
+}
+
+/* 4. Base overrides to use semantic tokens */
+@layer base {
+  html {
+    background-color: var(--c-slate-50);
+    color: var(--c-text-main);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .dark html,
+  .dark body {
+    background-color: var(--c-slate-100);
+    color: var(--c-text-main);
+  }
+
+  /* Utility aliases to make template classes consistent: */
+  .bg-bg-main { background-color: var(--c-surface); }
+  .text-text-main { color: var(--c-text-main); }
+  .text-text-muted { color: var(--c-text-muted); }
+}
+
+/* 5. Component classes using @apply for consistent UI */
+@layer components {
+  /* Primary gradient button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold shadow-soft-lg transition-transform transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    background-image: var(--g-primary);
+    color: white;
+    box-shadow: 0 6px 18px rgba(14,165,164,0.14);
+  }
+  .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.02); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* Ghost / outline button */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors;
+    border-color: rgba(71,85,105,0.10);
+    background-color: transparent;
+    color: var(--c-text-main);
+  }
+  .btn-ghost:hover { background-color: rgba(99,102,241,0.06); }
+
+  /* Card */
+  .card {
+    @apply bg-surface rounded-xl p-4 shadow-elevated transition-colors;
+    background-color: var(--c-surface);
+  }
+  .card-muted {
+    @apply p-4 rounded-lg;
+    background: linear-gradient(180deg, rgba(99,102,241,0.03), transparent);
+  }
+
+  /* Input */
+  .form-input {
+    @apply block w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none;
+    border-color: rgba(71,85,105,0.08);
+    background-color: transparent;
+  }
+  .form-input:focus { border-color: var(--c-primary); box-shadow: 0 4px 22px rgba(9,16,23,0.06); }
+
+  /* Tooltip (data-tooltip attr) */
+  .has-tooltip { position: relative; }
+  .has-tooltip[data-tooltip]:hover::after,
+  .has-tooltip[data-tooltip]:focus::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(100% + 8px);
+    background: rgba(2,6,23,0.9);
+    color: white;
+    padding: 6px 8px;
+    font-size: 13px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 60;
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  /* Small badge */
+  .badge {
+    @apply inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded;
+    background-color: rgba(99,102,241,0.08);
+    color: var(--c-accent);
+  }
+
+  /* Product card image wrapper */
+  .img-wrap {
+    @apply overflow-hidden rounded-xl bg-gradient-to-br from-transparent to-transparent;
+  }
+
+  /* Ripple / subtle hover for product cards */
+  .card-hover:hover { transform: translateY(-6px); transition: transform .28s; }
+}
+
+/* 6. Loader overlay (blur + spinner + message) */
+@layer utilities {
+  .overlay-blur {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    backdrop-filter: blur(6px);
+    background: linear-gradient(180deg, rgba(2,6,23,0.18), rgba(2,6,23,0.12));
+  }
+  .overlay-hidden { display: none !important; }
+
+  .loader {
+    @apply inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(2px);
+  }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.12);
+    border-top-color: rgba(255,255,255,0.94);
+    animation: spin-slow 0.9s linear infinite;
+  }
+
+  /* small animated toast (for success/failure) */
+  .mini-toast {
+    @apply fixed right-4 bottom-6 rounded-lg px-4 py-3 shadow-soft-lg text-sm font-medium;
+    background: rgba(6,11,23,0.75);
+    color: white;
+    z-index: 100;
+    animation: fade-in-up .28s both;
+  }
+}
+
+/* 7. Accessible focus rings for keyboard users */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+  border-radius: 8px;
+}
+
+/* 8. Simple responsive helpers */
+@media (max-width: 640px) {
+  .btn-primary { width: 100%; justify-content: center; }
+}

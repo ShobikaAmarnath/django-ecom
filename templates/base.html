@@ -1,33 +1,138 @@
 {% load static %}
 <!DOCTYPE HTML>
-<html lang="en" class=""> <head>
-    <meta charset="utf-8">
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="cache-control" content="max-age=604800" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>SMK E-commerce</title>
-
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    
-    <link rel="stylesheet" href="{% static 'css/output.css' %}">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
+<html lang="en" x-data="themeAndLoader()" :class="{ 'dark': dark }"> 
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="cache-control" content="max-age=604800" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SMK E-commerce</title>
+  <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
+
 <body class="bg-bg-main text-text-main">
-    
-    {% include 'includes/navbar.html' %}
-    
-    {% include 'includes/alerts.html' %}
-    
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-    
-    {% include 'includes/footer.html' %}
-    
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    </body>
+
+  <!-- Floating theme toggle -->
+  <button
+    x-show="true"
+    x-on:click="toggleTheme()"
+    x-bind:aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'"
+    class="fixed top-4 right-4 z-50 p-2 rounded-xl shadow-elevated btn-ghost"
+    title="Toggle theme"
+  >
+    <template x-if="dark">
+      <i class="fa-solid fa-sun" aria-hidden="true"></i>
+    </template>
+    <template x-if="!dark">
+      <i class="fa-solid fa-moon" aria-hidden="true"></i>
+    </template>
+    <span class="sr-only">Toggle theme</span>
+  </button>
+
+  {% include 'includes/navbar.html' %}
+
+  {% include 'includes/alerts.html' %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'includes/footer.html' %}
+
+  <!-- Loader overlay (shows when long action in progress) -->
+  <div
+    x-show="loading"
+    x-transition
+    x-cloak
+    role="status"
+    aria-live="polite"
+    class="overlay-blur"
+    style="display:none;"
+  >
+    <div class="loader card">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>
+        <div class="text-sm font-semibold" x-text="loadingMsg || 'Processing...'"></div>
+        <div class="text-xs text-text-muted mt-1" x-text="subMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tiny toast area (js will create toasts if needed) -->
+  <div id="mini-toast-root" aria-live="polite" class="pointer-events-none"></div>
+
+<script>
+/* Alpine component + small helpers for theme persistence and showing overlay */
+function themeAndLoader(){
+  return {
+    dark: (localStorage.getItem('smk_theme') === 'dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    loading: false,
+    loadingMsg: '',
+    subMsg: 'Please wait — we are working on it.',
+    init() {
+      // ensure html class matches initial theme
+      if (this.dark) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+
+      // Auto-listen for clicks on .needs-processing: show overlay while navigation occurs.
+      document.addEventListener('click', (ev) => {
+        const el = ev.target.closest && ev.target.closest('.needs-processing');
+        if (!el) return;
+        // show overlay
+        const msg = el.getAttribute('data-loading-text') || 'Processing...';
+        this.showLoading(msg);
+        // disable the button for safety (re-enable after navigation/submit)
+        el.setAttribute('disabled', 'disabled');
+        // If it's a normal <a> or submits the page, overlay will remain until unload.
+        // If you're using AJAX, call hideLoading() after response.
+        // We will auto-hide after 12s as a fallback to avoid stuck overlays.
+        setTimeout(()=>{ this.hideLoading(); el.removeAttribute('disabled'); }, 12000);
+      }, {capture:true});
+    },
+    toggleTheme(){
+      this.dark = !this.dark;
+      if (this.dark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('smk_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('smk_theme', 'light');
+      }
+    },
+    showLoading(msg){
+      this.loadingMsg = msg || 'Processing...';
+      this.loading = true;
+    },
+    hideLoading(){
+      this.loading = false;
+      this.loadingMsg = '';
+    }
+  }
+}
+
+/* Simple toast utility (use from any inline script): createToast('Added to cart') */
+function createToast(text, timeout=3500){
+  const root = document.getElementById('mini-toast-root');
+  if(!root) return;
+  const toast = document.createElement('div');
+  toast.className = 'mini-toast';
+  toast.textContent = text;
+  root.appendChild(toast);
+  setTimeout(()=> {
+    toast.style.transform = 'translateY(6px)';
+    toast.style.opacity = '0';
+  }, timeout - 300);
+  setTimeout(()=> { toast.remove(); }, timeout);
+}
+
+/* Optional: global helper so backend forms or templates can call it:
+   <button class="needs-processing" data-loading-text="Adding to cart...">Add to cart</button>
+   When clicked the overlay shows automatically.
+*/
+</script>
+
+</body>
 </html>

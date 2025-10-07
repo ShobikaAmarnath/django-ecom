@@ -1,14 +1,80 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block content %}
 
-<!-- Hero Banner -->
-<section class="py-8 bg-gray-50">
+<!-- Hero Slideshow -->
+<section class="py-8 bg-bg-section relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="rounded-lg overflow-hidden">
-      <img src="{% static 'images/banner_image.png' %}" class="w-full h-64 md:h-80 object-cover rounded-lg">
+    <div x-data="carousel()" x-init="init()" class="relative overflow-hidden rounded-lg" x-cloak>
+      
+      <!-- Slides -->
+      <template x-for="(slide, index) in slides" :key="index">
+        <div x-show="current === index" 
+             class="w-full h-64 md:h-96 transition-all duration-500 relative">
+          <img :src="slide" class="w-full h-64 md:h-96 object-cover object-center">
+          <!-- Overlay Text -->
+          <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center text-white px-4">
+            <h2 class="text-2xl md:text-4xl font-bold">Welcome to GreatKart</h2>
+            <p class="mt-2 text-sm md:text-lg">Your one-stop shop for everything you need</p>
+            <a href="{% url 'store' %}" 
+               class="mt-4 bg-gradient-to-r from-primary to-blue-600 text-white px-6 py-2 rounded-md hover:opacity-90 transition">
+              Shop Now
+            </a>
+          </div>
+        </div>
+      </template>
+
+      <!-- Previous / Next Buttons -->
+      <button @click="prev()" class="absolute left-2 top-1/2 transform -translate-y-1/2 text-white text-3xl p-1 bg-black/30 rounded-md hover:bg-black/50 transition"> < </button>
+      <button @click="next()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-white text-3xl p-1 bg-black/30 rounded-md hover:bg-black/50 transition">></button>
+
+      <!-- Indicators -->
+      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        <template x-for="(slide, index) in slides" :key="index">
+          <button @click="goTo(index)" 
+                  :class="{'bg-white': current === index, 'bg-gray-400': current !== index}"
+                  class="w-3 h-3 rounded-full transition"></button>
+        </template>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Categories -->
+<section class="py-12 bg-bg-main">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-8">
+      <h3 class="text-2xl font-bold text-text-main">Featured Categories</h3>
+      <a href="{% url 'store' %}" class="text-primary hover:underline">View All</a>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+      <!-- Static Example Categories -->
+      <a href="#" class="flex flex-col items-center p-4 bg-bg-card rounded-lg shadow hover:shadow-lg transition">
+        <img src="{% static 'images/cat_electronics.png' %}" alt="Electronics" class="w-14 h-14 object-contain mb-3">
+        <span class="text-sm font-medium text-text-main">Electronics</span>
+      </a>
+      <a href="#" class="flex flex-col items-center p-4 bg-bg-card rounded-lg shadow hover:shadow-lg transition">
+        <img src="{% static 'images/cat_fashion.png' %}" alt="Fashion" class="w-14 h-14 object-contain mb-3">
+        <span class="text-sm font-medium text-text-main">Fashion</span>
+      </a>
+      <a href="#" class="flex flex-col items-center p-4 bg-bg-card rounded-lg shadow hover:shadow-lg transition">
+        <img src="{% static 'images/cat_home.png' %}" alt="Home" class="w-14 h-14 object-contain mb-3">
+        <span class="text-sm font-medium text-text-main">Home</span>
+      </a>
+      <a href="#" class="flex flex-col items-center p-4 bg-bg-card rounded-lg shadow hover:shadow-lg transition">
+        <img src="{% static 'images/cat_beauty.png' %}" alt="Beauty" class="w-14 h-14 object-contain mb-3">
+        <span class="text-sm font-medium text-text-main">Beauty</span>
+      </a>
+      <a href="#" class="flex flex-col items-center p-4 bg-bg-card rounded-lg shadow hover:shadow-lg transition">
+        <img src="{% static 'images/cat_sports.png' %}" alt="Sports" class="w-14 h-14 object-contain mb-3">
+        <span class="text-sm font-medium text-text-main">Sports</span>
+      </a>
+      <a href="#" class="flex flex-col items-center p-4 bg-bg-card rounded-lg shadow hover:shadow-lg transition">
+        <img src="{% static 'images/cat_toys.png' %}" alt="Toys" class="w-14 h-14 object-contain mb-3">
+        <span class="text-sm font-medium text-text-main">Toys</span>
+      </a>
     </div>
   </div>
 </section>
@@ -18,62 +84,119 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Section Header -->
     <div class="flex justify-between items-center mb-8">
-      <h3 class="text-2xl font-bold text-gray-900">Popular Products</h3>
-      <a href="{% url 'store' %}" class="bg-white border border-primary text-primary px-6 py-2 rounded-md hover:bg-primary hover:text-white transition-colors">
+      <h3 class="text-2xl font-bold text-text-main">Popular Products</h3>
+      <a href="{% url 'store' %}" 
+         class="bg-gradient-to-r from-primary to-blue-600 text-white px-6 py-2 rounded-md hover:opacity-90 transition">
         See all
       </a>
     </div>
 
-    <!-- Products Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {% for product in products %}
-          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden relative">
-              <a href="{{ product.get_url }}">
-                <img src="{{product.product_image.url}}" alt="{{ product.product_name }}"
-                  class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+    {% if products %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {% for product in products %}
+      <div class="bg-bg-card rounded-lg shadow hover:shadow-lg transition group overflow-hidden">
+        
+        <!-- Image -->
+        <div class="relative">
+          <a href="{{ product.get_url }}">
+            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}"
+                 class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300">
+          </a>
+          {% if product.stock == 0 %}
+            <span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">Out of Stock</span>
+          {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="p-3">
+          <a href="{{ product.get_url }}" 
+             class="block text-sm font-medium text-text-main hover:text-primary transition line-clamp-2"
+             title="{{ product.product_name }}">
+            {{ product.product_name }}
+          </a>
+
+          <div class="mt-2 flex justify-between items-center">
+            <span class="text-base font-bold text-text-main">₹{{ product.product_price }}</span>
+            <div class="flex items-center gap-3">
+              <!-- Wishlist -->
+              <a href="{% url 'toggle_wishlist' product.id %}" 
+                 class="wishlist-btn hover:text-red-600 transition" 
+                 data-loader="true" 
+                 title="Wishlist">
+                {% if product.id in wishlist_products %}
+                <i class="fas fa-heart text-red-600"></i>
+                {% else %}
+                <i class="far fa-heart text-gray-500"></i>
+                {% endif %}
               </a>
-            </div>
-            <div class="p-4">
-              <div class="flex justify-between items-center mb-2">
-                <a href="{{ product.get_url }}"
-                  class="text-base font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2 w-2/3">
-                  {{ product.product_name }}
-                </a>
-                <div class="flex items-center gap-6">
-                  <!-- Wishlist Icon -->
-                   <!-- <p>Wishlist Products: {{ wishlist_products }}</p> -->
-                  <a href="{% url 'toggle_wishlist' product.id %}" title="Toggle Wishlist"
-                    class="hover:text-red-600 transition">
-                    {% if product.id in wishlist_products %}
-                    <i class="fas fa-heart text-red-600"></i>
-                    {% else %}
-                    <i class="far fa-heart text-gray-500"></i>
-                    {% endif %}
-                  </a>
-
-                  <!-- Cart / Out of Stock -->
-                  {% if product.stock > 0 %}
-                  <a href="{{ product.get_url }}" title="Add to Cart"
-                    class="text-blue-600 hover:text-blue-800 transition">
-                    <i class="fas fa-cart-plus text-lg"></i>
-                  </a>
-                  {% else %}
-                  <span title="Out of Stock" class="text-gray-400 cursor-not-allowed">
-                    <i class="fas fa-shopping-cart text-lg opacity-50"></i>
-                  </span>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="mt-0">
-                <span class="text-lg font-bold text-gray-900">₹{{ product.product_price }}</span>
-              </div>
+              <!-- Cart -->
+              {% if product.stock > 0 %}
+              <a href="{{ product.get_url }}" 
+                 class="cart-btn text-primary hover:text-blue-800 transition" 
+                 data-loader="true" 
+                 title="Add to Cart">
+                <i class="fas fa-cart-plus text-lg"></i>
+              </a>
+              {% else %}
+              <span class="text-gray-400 cursor-not-allowed" title="Out of Stock">
+                <i class="fas fa-shopping-cart text-lg opacity-50"></i>
+              </span>
+              {% endif %}
             </div>
           </div>
-          {% endfor %}
         </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="text-center text-gray-500 mt-8">No popular products available right now. Check back later!</p>
+    {% endif %}
   </div>
 </section>
+
+<!-- Loader Overlay -->
+<div id="loader-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center hidden z-50">
+  <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loader-overlay");
+  const buttons = document.querySelectorAll("[data-loader='true']");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      loader.classList.remove("hidden");
+      // Automatically hide after 1s (replace with AJAX success/redirect handling)
+      setTimeout(() => loader.classList.add("hidden"), 1000);
+    });
+  });
+});
+function carousel() {
+  return {
+    current: 0,
+    slides: [
+      "{% static 'images/banner_image1.png' %}",
+      "{% static 'images/banner_image2.png' %}",
+      "{% static 'images/banner_image3.png' %}",
+      "{% static 'images/banner_image4.png' %}",
+    ],
+    next() {
+      this.current = (this.current + 1) % this.slides.length;
+    },
+    prev() {
+      this.current = (this.current - 1 + this.slides.length) % this.slides.length;
+    },
+    goTo(index) {
+      this.current = index;
+    },
+    init() {
+      setInterval(() => {
+        this.next();
+      }, 5000); // auto-slide every 5 seconds
+    }
+  }
+}
+</script>
 
 {% endblock content %}

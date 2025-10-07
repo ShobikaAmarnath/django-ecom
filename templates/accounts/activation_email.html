@@ -1,19 +1,41 @@
 {% autoescape off %}
 
-<p>Hi {{ user.first_name }},</p>
+{% with primary_color="bg-blue-600 hover:bg-blue-700" %}
 
-<p>Thank you for creating an account with us. Please click on the link below to confirm your email address and activate your account:</p>
+<div class="min-h-screen bg-gray-100 flex items-center justify-center p-6 font-sans">
+  <div class="max-w-lg w-full bg-white rounded-lg shadow-lg p-8">
+    
+    <!-- Greeting -->
+    <p class="text-base text-gray-800 mb-4">
+      Hi {{ user.first_name }},
+    </p>
 
-<p style="margin: 20px 0;">
-  <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" 
-     target="_blank" 
-     style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-    Activate Your Account
-  </a>
-</p>
+    <!-- Message -->
+    <p class="text-base text-gray-800 leading-relaxed mb-6">
+      Thank you for creating an account with us. Please click on the link below to confirm your email address and activate your account:
+    </p>
 
-<p>If you did not register on our site, please ignore this email.</p>
+    <!-- Button -->
+    <div class="text-center mb-6">
+      <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" target="_blank"
+         class="inline-block {{ primary_color }} text-white font-bold py-3 px-6 rounded-lg transition duration-200">
+        Activate Your Account
+      </a>
+    </div>
 
-<p>Best regards,<br>The SMK-ECOM Team</p>
+    <!-- Notice -->
+    <p class="text-sm text-gray-500 mb-6">
+      If you did not register on our site, please ignore this email.
+    </p>
 
+    <!-- Footer -->
+    <p class="text-sm text-gray-600">
+      Best regards,<br>
+      <strong>The SMK-ECOM Team</strong>
+    </p>
+
+  </div>
+</div>
+
+{% endwith %}
 {% endautoescape %}
